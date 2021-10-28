@@ -17,8 +17,12 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
     private var textSelected = false
     private var initialQuestionPop = false
     private var registeredQuestions = [String]()
+    public var modeSwitch = false
     
+    var unclickedSame = false
+    var typeSelected = false
     var selectionType = 0
+    var firstresponseType = false
     
     @IBOutlet weak var timeLabel: UILabel!
     
@@ -27,10 +31,12 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
     @IBOutlet weak var helpBtn: UIButton!
     @IBOutlet weak var textBtn: UIButton!
     
+    @IBOutlet weak var notification: UILabel!
     //----
     @IBOutlet weak var currentQuestionLabel: UILabel!
     
-    var type_response = ""
+    var response_type = [String]()
+    var responsetypes = ["agreement", "change", "elaboration", "disagreement"]
     var prev_type_response = ""
         
     var prev_lineType = ""
@@ -136,6 +142,12 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
     @IBOutlet weak var react10a: UIButton!
     @IBOutlet weak var react10b: UIButton!
     
+    @IBOutlet weak var agreementBtn: UIButton!
+    @IBOutlet weak var changeBtn: UIButton!
+    @IBOutlet weak var expandingBtn: UIButton!
+    @IBOutlet weak var disagreementBtn: UIButton!
+    
+    
     @IBOutlet weak var startButton: UIButton!
     
     var firstSpeaker: Bool = true
@@ -150,6 +162,7 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
     var partNames = [UILabel]()
     var tableNames = [String]()
     
+    var responseTypeCnt: [Int] = [0,0,0,0]
     var speakingTime:[Int] = [0,0,0,0,0,0,0,0,0,0,0]
     var frequencySpeak:[Int] = [0,0,0,0,0,0,0,0,0,0,0]
     
@@ -160,20 +173,6 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
         formatter.timeStyle = .long
         formatter.locale = .current
         return formatter
-    }()
-    
-    lazy var popUpWindow: PopUp = {
-        let view = PopUp()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.delegate = self
-        return view
-    }()
-    
-    let visualEffectView: UIVisualEffectView = {
-        let blurEffect = UIBlurEffect(style: .light)
-        let view = UIVisualEffectView(effect: blurEffect)
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
     }()
     
     var soundRecorder : AVAudioRecorder!
@@ -193,7 +192,7 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
         fileName = "\(discussionId)-Hark-\(dateString).m4a"
         setupRecorder()
         currentQuestionLabel.adjustsFontSizeToFitWidth = true
-        
+        notification.isHidden = true
         stackView.isHidden = true
         questionView.isHidden = true
         minute = 0
@@ -227,6 +226,29 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
         }
         for btn in self.reactBButtons{
             btn.isEnabled = false
+        }
+        
+        if modeSwitch == false {
+            agreementBtn.isEnabled = false
+            changeBtn.isEnabled = false
+            expandingBtn.isEnabled = false
+            disagreementBtn.isEnabled = false
+            
+            agreementBtn.isHidden = true
+            changeBtn.isHidden = true
+            expandingBtn.isHidden = true
+            disagreementBtn.isHidden = true
+        }
+        else {
+            agreementBtn.isEnabled = true
+            changeBtn.isEnabled = true
+            expandingBtn.isEnabled = true
+            disagreementBtn.isEnabled = true
+            
+            agreementBtn.isHidden = false
+            changeBtn.isHidden = false
+            expandingBtn.isHidden = false
+            disagreementBtn.isHidden = false
         }
         
         currentPoint = table.center
@@ -346,7 +368,6 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
             }
         }
         currentQuestionLabel.text = self.currentQuestion
-        print("notification_question: \(self.currentQuestion)")
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -378,7 +399,6 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
                     minTime = String(min)
                 }
                 self.timeLabel.text = "\(minTime):00"
-                print("intial setting: \(minTime):\(self.second)")
                 self.count = min * 60
                 self.initialTime = min * 60
                 self.time_fourth = self.count/4
@@ -395,7 +415,6 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
     }
     
     deinit {
-        print("Remove NotificationCenter Deinit")
         NotificationCenter.default.removeObserver(self, name: DiscussionViewController.topicNotification, object: nil)
         NotificationCenter.default.removeObserver(self, name: DiscussionViewController.questionNotification, object: nil)
         NotificationCenter.default.removeObserver(self, name: DiscussionViewController.addQuestionNotification, object: nil)
@@ -406,7 +425,6 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
         tableConfig = [1: UIImage(named: "chair1")!, 2: UIImage(named: "chair1")!, 3: UIImage(named: "chair1")!, 4: UIImage(named: "chair2")!,5: UIImage(named: "chair2")!,6: UIImage(named: "chair4")!,7: UIImage(named: "chair4")!,8: UIImage(named: "chair4")!,9: UIImage(named: "chair3")!,10: UIImage(named: "chair3")!]
         var cnt = 0
         for i in tableSetting {
-            print("selected tables: \(i)")
             tableConfig[i] = UIImage(named: "Boy")
             partNames[i-1].text = names[cnt]
             buttonEnabes[i-1] = true
@@ -502,6 +520,49 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
         responseList.append(partNames[sender.tag-1].text!)
     }
     
+    @IBAction func responseTypePushed(_ sender: UIButton) {
+        var selectedRespBtn = UIButton()
+        var type = 0
+        switch sender.tag{
+        case 1:
+            selectedRespBtn = agreementBtn
+            type = 1
+            responseTypeCnt[0] += 1
+        case 2:
+            selectedRespBtn = changeBtn
+            type = 2
+            responseTypeCnt[1] += 1
+        case 3:
+            selectedRespBtn = expandingBtn
+            type = 3
+            responseTypeCnt[2] += 1
+        case 4:
+            selectedRespBtn = disagreementBtn
+            type = 4
+            responseTypeCnt[3] += 1
+        default:
+            print("default btn")
+            
+        }
+        print(type)
+        selectedRespBtn.isEnabled = false
+        response_type.append(responsetypes[sender.tag-1])
+        
+        //enable speaking buttons
+        if(modeSwitch == true){
+            typeSelected = true
+            notification.isHidden = true
+            for (element, _) in tableConfig {
+                self.buttons[element-1].isEnabled = buttonEnabes[element-1]
+            }
+            
+            if (firstresponseType == false){
+                addLine(toPoint: prevBtn.center, lineType: prev_type_response, type: type)
+                firstresponseType = true
+            }
+        }
+    }
+    
     @IBAction func responseBbtnClick(_ sender: UIButton) {
         var selectedRespBBtn = UIButton()
         switch sender.tag{
@@ -529,7 +590,6 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
             print("default btn")
             
         }
-        
         selectedRespBBtn.isEnabled = false
         responseBList.append(partNames[sender.tag-1].text!)
     }
@@ -548,25 +608,30 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
         secondPoint = touchPoint
         
         if firstBtn{
+            btnQueue.append(selectedBtn)
+            firstresponseType = false
+            typeSelected = false
             firstBtn = false
-            btnQueue.append(selectedBtn) // b , c, d // a , a, c // a, a, a, s
             startTime = count
             currentPoint = selectedBtn.center
         }
         
         else if (prevBtn==selectedBtn){
+            selectionType = 0
             if (selectedBtn.backgroundColor == .none){ // starting time record
-                print("same button clicked: talking")
                 btnQueue.append(selectedBtn)
-                //presentOptions()
+                firstresponseType = false
+                typeSelected = false
                 resetBtn()
+                response_type = []
                 responseList = []
                 responseBList = []
                 selectedBtn.backgroundColor = UIColor(red: 0.678, green: 0.847, blue: 0.902, alpha: 1.0)
                 startTime = count
             }
             else {
-                selectedBtn.backgroundColor = .none
+                unclickedSame = true
+                selectedBtn.backgroundColor = .none //ending the time record of the same person
                 endTime = count
                 let indexOfSelected = buttons.firstIndex(of: selectedBtn)
                 duration = startTime - endTime
@@ -577,26 +642,28 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
                     return
                 }
                 index = ids
-                
-                presentOptions(type: 0)
-                //add flow to db
+                presentoptions()
                 
             }
         }
         else if !(prevBtn==selectedBtn){
-            btnQueue.append(selectedBtn)
+            selectionType = 1
             if (sameBtn == true){
-                print("previously deselected the same btn")
                 btnQueue.append(selectedBtn)
-                //presentOptions()
+                firstresponseType = false
+                typeSelected = false
                 resetBtn()
+                response_type = []
                 responseList = []
                 responseBList = []
+                
                 startTime = count
                 sameBtn = false
             }
             else if (sameBtn == false){
-                print("moving to next btn")
+                btnQueue.append(selectedBtn)
+                firstresponseType = false
+                typeSelected = false
                 endTime = count
                 let indexOfSelected = buttons.firstIndex(of: prevBtn)
                 duration = startTime - endTime
@@ -607,42 +674,93 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
                     return
                 }
                 index = ids
-                
-                presentOptions(type: 1)
+            }
+            presentoptions()
+        }
+        
+        if(modeSwitch == true){
+            if(typeSelected == false){
+                notification.isHidden = false
+                for (element, _) in tableConfig {
+                    self.buttons[element-1].isEnabled = false
+                }
             }
         }
         prevBtn = selectedBtn
-        
         return
     }
     
-    private func presentOptions(type: Int){
-        view.addSubview(popUpWindow)
-        selectionType = type
-        popUpWindow.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
-        popUpWindow.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        popUpWindow.heightAnchor.constraint(equalToConstant: view.frame.height).isActive = true
-        popUpWindow.widthAnchor.constraint(equalToConstant: view.frame.width).isActive = true
+    private func presentoptions(){
+        self.addToFlow(person: partNames[index].text!, startTime: startTime, endTime: endTime, duration: duration, responseType:response_type, responseAList:responseList, responseBList:responseBList)
         
-        popUpWindow.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
-        popUpWindow.alpha = 0
-        
-        UIView.animate(withDuration: 0.5){
-            self.visualEffectView.alpha = 1
-            self.popUpWindow.alpha = 1
-            self.popUpWindow.transform = CGAffineTransform.identity
+        if(selectionType==0){
+            sameBtn = true
         }
+        else if(selectionType==1){
+            resetBtn()
+            response_type = []
+            responseList = []
+            responseBList = []
+            startTime = endTime
+        }
+        
+//        addLine(toPoint: prevBtn.center, lineType: prev_type_response)
+        currentPoint = secondPoint!
+        
+        secondPoint = nil
     }
     
-    private func addToFlow(person:String,startTime: Int, endTime: Int, duration: Int, responseType:String, responseAList:[String],responseBList:[String]){
+    func addLine(toPoint end:CGPoint, lineType:String, type: Int) {
+        print("adding line")
+        let line = CAShapeLayer()
+        let linePath = UIBezierPath()
         
-        print("\(person), \(startTime), \(endTime), \(duration), \(responseType)")
-        DatabaseManager.shared.recordDiscussionFlow(with: discussionId, selectedPerson: person, startTime: startTime, endTime: endTime, duration: duration, responseType: responseType, responseAList: responseAList, responseBList: responseBList, completion: {success in
-            if(success){
-                print("recorded")
+        if (btnQueue.count >= 2){
+            linePath.move(to: btnQueue[0].center)
+            linePath.addLine(to: btnQueue[1].center)
+            btnQueue.removeFirst(1)
+        }
+        
+        line.path = linePath.cgPath
+        
+        if modeSwitch == false{
+            line.strokeColor = UIColor(red: 0/255, green: 0/255, blue: 255/255, alpha: 0.3).cgColor
+        }
+        else if modeSwitch == true{
+            if(type == 1){
+                line.strokeColor = UIColor(red: 0/255, green: 0/255, blue: 255/255, alpha: 0.3).cgColor
+            }
+            else if(type == 2){
+                line.strokeColor = UIColor(red: 50/255, green: 205/255, blue: 50/255, alpha: 0.3).cgColor
+            }
+            else if(type == 3){
+                line.strokeColor = UIColor(red: 255/255, green: 165/255, blue: 0/255, alpha: 0.3).cgColor
+            }
+            else if(type == 4){
+                line.strokeColor = UIColor(red: 255/255, green: 0/255, blue: 0/255, alpha: 0.3).cgColor
             }
             else{
-                print("error")
+                line.strokeColor = UIColor(red: 255/255, green: 255/255, blue: 255/255, alpha: 0.3).cgColor
+            }
+        }
+        
+        prev_lineType = lineType
+        
+        line.lineWidth = 2
+        line.lineJoin = CAShapeLayerLineJoin.round
+        self.view.layer.addSublayer(line)
+        
+    }
+    
+    
+    private func addToFlow(person:String,startTime: Int, endTime: Int, duration: Int, responseType:[String], responseAList:[String],responseBList:[String]){
+        
+        DatabaseManager.shared.recordDiscussionFlow(with: discussionId, selectedPerson: person, startTime: startTime, endTime: endTime, duration: duration, responseType: responseType, responseAList: responseAList, responseBList: responseBList, completion: {success in
+            if(success){
+//                print("recorded")
+            }
+            else{
+//                print("error")
             }
         })
     }
@@ -701,38 +819,10 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
         timeString += String(format: "%02d", seconds)
         return timeString
     }
-    
-    func addLine(toPoint end:CGPoint, lineType:String) {
-        let line = CAShapeLayer()
-        let linePath = UIBezierPath()
-        
-        if (btnQueue.count >= 3){
-            linePath.move(to: btnQueue[1].center)
-            linePath.addLine(to: btnQueue[0].center)
-            btnQueue.remove(at: 0)
-            print(btnQueue)
-        }
-        line.path = linePath.cgPath
-        
-        
-        if lineType == "" { line.strokeColor = UIColor(red: 0/255, green: 0/255, blue: 255/255, alpha: 0).cgColor }
-        else if lineType == "agreement" { line.strokeColor = UIColor(red: 0/255, green: 0/255, blue: 255/255, alpha: 0.3).cgColor}
-        else if lineType == "disagreement" { line.strokeColor = UIColor(red: 255/255, green: 0/255, blue: 0/255, alpha: 0.3).cgColor}
-        else if lineType == "elaboration" { line.strokeColor = UIColor(red: 255/255, green: 165/255, blue: 0/255, alpha: 0.3).cgColor}
-        else if lineType == "change" { line.strokeColor = UIColor(red: 50/255, green: 205/255, blue: 50/255, alpha: 0.3).cgColor}
-        
-        prev_lineType = lineType
-        
-        line.lineWidth = 2
-        line.lineJoin = CAShapeLayerLineJoin.round
-        self.view.layer.addSublayer(line)
-        
-    }
+
     
     func discussionEnded(){
-        print("Timer ended")
         finishedTime = count
-        print("finished at: \(finishedTime)")
         
         let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
         let resultVC = storyBoard.instantiateViewController(withIdentifier: "resultView") as! ResultViewController
@@ -744,6 +834,7 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
         resultVC.questions = self.usedQuestions
         resultVC.initialTime = self.initialTime
         resultVC.finishTime = self.finishedTime
+        resultVC.responseTypeCnt = self.responseTypeCnt
         
         if isRecording {
             soundRecorder.stop()
@@ -753,7 +844,7 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
         
         DatabaseManager.shared.recordDiscussionResult(with: discussionId, speakFrequency: frequencySpeak, speakTime: speakingTime, usedQuestions: usedQuestions, initialTime: initialTime, finishTime: finishedTime, completion: {success in
             if(success){
-                print("success")
+//                print("success")
             }
             else{
                 print("error in saving the result")
@@ -766,7 +857,7 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
     
     
     func speakMoreTime(){
-        print("time for some to speak more")
+//        print("time for some to speak more")
         var peopleAllowed = [Int]()
         var peopleNotAllowed = [Int]()
         var totalTime = 0
@@ -775,7 +866,6 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
         }
         
         let averageSpoken = totalTime/numParticipants
-        print("average spoken: \(averageSpoken)")
         var cnt = 0
         for value in speakingTime{
             if (value < averageSpoken) {
@@ -802,58 +892,19 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
             self.reactAButtons[element-1].isEnabled = buttonEnabes[element-1]
             self.reactBButtons[element-1].isEnabled = buttonEnabes[element-1]
         }
+        agreementBtn.isEnabled = true
+        disagreementBtn.isEnabled = true
+        expandingBtn.isEnabled = true
+        changeBtn.isEnabled = true
     }
     
     func showAlert(){
         let alert = UIAlertController(title: "Speak Up Time", message: "participants who spoke less than the table average will be given time to speak up from now to the end of the discussion!", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "okay", style: .cancel, handler: {action in
-            print("tapped okay")
+//            print("tapped okay")
             self.count = self.count - 1
             self.startStopClicked()
         }))
         present(alert, animated: true)
-    }
-}
-
-
-extension DiscussionViewController: PopUpDelegate{
-    
-    func onResponseReady(responseType: Int) {
-        print("response type is: \(responseType)")
-        
-        
-        if responseType == 1 { type_response = "agreement"}
-        else if responseType == 2 { type_response = "disagreement"}
-        else if responseType == 3 { type_response = "elaboration"}
-        else if responseType == 4 { type_response = "change"}
-        
-        prev_type_response = type_response
-        
-        self.addToFlow(person: partNames[index].text!, startTime: startTime, endTime: endTime, duration: duration, responseType: prev_type_response,responseAList:responseList,responseBList:responseBList)
-        
-        if(selectionType==0){
-            sameBtn = true
-        }
-        else if(selectionType==1){
-            
-            resetBtn()
-            responseList = []
-            responseBList = []
-            startTime = endTime
-        }
-        
-        addLine(toPoint: prevBtn.center, lineType: prev_type_response)
-        currentPoint = secondPoint!
-        
-        secondPoint = nil
-        
-        UIView.animate(withDuration: 0.5, animations: {
-            self.visualEffectView.alpha = 0
-            self.popUpWindow.alpha = 0
-            self.popUpWindow.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
-        }){ (_) in
-            self.popUpWindow.removeFromSuperview()
-            print("did remove popup")
-        }
     }
 }

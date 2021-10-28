@@ -3,9 +3,18 @@ import Charts
 import UIKit
 import AVFoundation
 
+struct flow {
+    let name: String
+    let duration: String
+    let endTime: String
+    let responseType: [String]
+    let startTime: String
+}
+
 class ResultViewController: UIViewController, ChartViewDelegate, UITableViewDelegate, UITableViewDataSource,AVAudioPlayerDelegate, AVAudioRecorderDelegate{
     
     var soundPlayer : AVAudioPlayer!
+    var discussionFlows = [flow]()
     
     var pieChart = PieChartView()
     var barChart = BarChartView()
@@ -22,11 +31,13 @@ class ResultViewController: UIViewController, ChartViewDelegate, UITableViewDele
     var tableName = [String]()
     var speakTime = [Int]()
     var speakFrequency = [Int]()
+    var responseTypeCnt = [Int]()
     var discussionId = ""
     var questions = [String]()
     var nonZeroTableName = [String]()
     var nonZeroSpeakTime = [Int]()
     var filename = ""
+    let responseTypes = ["agreement", "change", "expand", "disagreement"]
     
     let tableView = UITableView()
     let questionTableView = UITableView()
@@ -92,6 +103,9 @@ class ResultViewController: UIViewController, ChartViewDelegate, UITableViewDele
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        //loading
+//        getDiscussionFlow()
+        
         title = "Discussion Analytics"
         print("filename: \(filename)")
         let duration = initialTime - finishTime
@@ -135,6 +149,7 @@ class ResultViewController: UIViewController, ChartViewDelegate, UITableViewDele
         questionTableView.delegate = self
         questionTableView.dataSource = self
     }
+    
     
     override func viewDidLayoutSubviews() {
         spokenLabel.frame = CGRect(x: 0, y: 0, width: 50, height: 25)
@@ -243,6 +258,42 @@ class ResultViewController: UIViewController, ChartViewDelegate, UITableViewDele
         }
     }
     
+    private func getDiscussionFlow(){
+        DatabaseManager.shared.getDiscussionFlow(with: discussionId, completion: { [weak self]result in
+            switch result {
+            case .success(let flows):
+                self?.discussionFlows = flows
+                //end loading
+            case .failure(let error):
+                print("failed to get flows: \(error)")
+            }
+        })
+        
+        interpretFlow()
+    }
+    
+    func interpretFlow(){
+        //first load the discussion set up information
+//        var speakingTime = [Int]()
+//        var speakingFrequency = [Int]()
+//        var responseTypesCnt = [Int]()
+        
+            //speaking time - pie chart
+            
+            
+            //speaking frequency - bar graph
+            //answered questions - table view
+            //response types - table view
+            //interactions - table view (in order of size)
+            
+            
+            
+            //organize the flow so that it is possible to compare the frequency
+//        for i in 0...discussionFlows.count-1 {
+//
+//        }
+    }
+    
     func getDocumentsDirectory() -> URL {
         let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
         return paths[0]
@@ -266,7 +317,7 @@ class ResultViewController: UIViewController, ChartViewDelegate, UITableViewDele
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if tableView == self.tableView
         {
-            return nonZeroSpeakTime.count/2
+            return responseTypeCnt.count
         } else {
             return questions.count
         }
@@ -277,9 +328,7 @@ class ResultViewController: UIViewController, ChartViewDelegate, UITableViewDele
         if tableView == self.tableView
         {
             let cell = tableView.dequeueReusableCell(withIdentifier: "resultCell", for: indexPath)
-            let time = timerFormat(seconds: Int(nonZeroSpeakTime[indexPath.row]))
-            let timeString = makeTimeString(minutes: time.0, seconds: time.1)
-            cell.textLabel?.text = "Name: \(nonZeroTableName[indexPath.row]) |  Speak Time: \(timeString)"
+            cell.textLabel?.text = "\(responseTypes[indexPath.row]): \(responseTypeCnt[indexPath.row])"
             return cell
         } else {
             let cell = tableView.dequeueReusableCell(withIdentifier: "resultCell", for: indexPath)
@@ -291,7 +340,7 @@ class ResultViewController: UIViewController, ChartViewDelegate, UITableViewDele
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if tableView == self.tableView
         {
-            print("\(nonZeroTableName[indexPath.row]) selected")
+            print("\(responseTypeCnt[indexPath.row]) selected")
             tableView.deselectRow(at: indexPath, animated: false)
         }
         else {

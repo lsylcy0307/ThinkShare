@@ -568,7 +568,7 @@ extension DatabaseManager{
         })
     }
     
-    public func recordDiscussionFlow(with discussionId:String, selectedPerson: String, startTime: Int, endTime: Int, duration: Int, responseType:String, responseAList:[String],responseBList:[String], completion: @escaping (Bool) -> Void){
+    public func recordDiscussionFlow(with discussionId:String, selectedPerson: String, startTime: Int, endTime: Int, duration: Int, responseType:[String], responseAList:[String],responseBList:[String], completion: @escaping (Bool) -> Void){
         
         let start_Time = timerFormat(seconds: startTime)
         let startTimeString = makeTimeString(minutes: start_Time.0, seconds: start_Time.1)
@@ -625,6 +625,66 @@ extension DatabaseManager{
             }
             completion(true)
         })
+    }
+    
+    public func getDiscussionSettings(with email:String, discussionID: String, completion: @escaping (Result<Setup, Error>) -> Void){
+        
+        database.child("\(email)/discussions").observeSingleEvent(of: .value, with: { snapshot in
+            guard let collection = snapshot.value as? [[String: Any]] else {
+                completion(.failure(DatabaseError.failedToFetch))
+                return
+            }
+            
+            if let setting = collection.first(where: {
+                guard let targetID = $0["id"] as? String else {
+                    return false
+                }
+                return discussionID == targetID
+            }) {
+                print(setting)
+                guard let groupName = setting["group_name"] as? String,
+                      let date = setting["date"] as? String ,
+                      let settingCode = setting["setting_code"] as? String ,
+                      let teacherName = setting["teacherName"] as? String,
+                      let discussionSetting = setting["discussion_setup"] as? [String:Any]
+                else {
+                    print("could not fetch the setting")
+                    return
+                }
+//                print(discussionSetting)
+                let setup = Setup(date: date, groupName: groupName, id: discussionID, settingCode: settingCode, teacherName: teacherName, names: discussionSetting["name_setting"] as! [String], numParticipants: discussionSetting["num_students"] as! Int, tableSetting: discussionSetting["table_setting"] as! [Int])
+                completion(.success(setup))
+                return
+            }
+            
+        })
+        
+    }
+    
+    public func getDiscussionFlow(with discussionId:String, completion: @escaping (Result<[flow], Error>) -> Void){
+        
+        database.child("\(discussionId)/discussionFlow").observe(.value, with: { snapshot in
+            guard let value = snapshot.value as? [[String: Any]] else{
+                completion(.failure(DatabaseError.failedToFetch))
+                return
+            }
+            
+            let flows: [flow] = value.compactMap({ dictionary in
+                guard let name = dictionary["name"] as? String,
+                      let endTime = dictionary["endTime"] as? String,
+                      let duration = dictionary["duration"] as? String,
+                      let startTime = dictionary["startTime"] as? String,
+                      let responseType = dictionary["responseType"] as? [String] else {
+                    return nil
+                }
+                print(name)
+                
+                return flow(name: name, duration: duration, endTime: endTime, responseType: responseType, startTime: startTime)
+            })
+            print(flows)
+            completion(.success(flows))
+        })
+        
     }
     
     public func getAllDiscussionHistory(for email: String, completion: @escaping (Result<[discussionHistory], Error>) -> Void) {

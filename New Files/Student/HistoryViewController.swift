@@ -108,17 +108,20 @@ extension HistoryViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
-        let selectedModel = discussions[indexPath.row]
         
-//        let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
-//        let discussionVC = storyBoard.instantiateViewController(withIdentifier: "createView") as! createGroupViewController
-//        discussionVC.setting = selectedModel
-//        discussionVC.title = selectedModel.code
-//
-//        let navVC = UINavigationController(rootViewController: discussionVC)
-//        navVC.modalPresentationStyle = .overFullScreen
-//        self.present(navVC, animated: true)
+        let selectedModel = discussions[indexPath.row]
+        let discussionID = selectedModel.code
+        print(discussionID)
+        
+        tableView.deselectRow(at: indexPath, animated: true)
+        
+        let vc = DiscussionResultViewController()
+        vc.discussionId = discussionID
+        
+        let nav = UINavigationController(rootViewController: vc)
+        nav.modalPresentationStyle = .overFullScreen
+        self.present(nav, animated: true)
+        
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat{

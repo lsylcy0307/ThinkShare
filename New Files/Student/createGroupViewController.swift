@@ -13,10 +13,14 @@ class createGroupViewController: UIViewController {
     
     var setting:registeredSetting?
     
+    var modeSwitch = false
+    
     private var discussion_id = ""
     
     @IBOutlet weak var groupNameField: UITextField!
     @IBOutlet weak var numBoysField: UITextField!
+    
+    @IBOutlet weak var `switch`: UISwitch!
     
     @IBOutlet weak var backBtn: UIButton!
     @IBOutlet weak var continueBtn: UIButton!
@@ -36,7 +40,7 @@ class createGroupViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
-        
+        `switch`.setOn(false, animated: false)
         numBoysField.isUserInteractionEnabled = false
         
         backBtn.layer.cornerRadius = 12
@@ -53,6 +57,16 @@ class createGroupViewController: UIViewController {
         }
         window.rootViewController = ContainerViewController()
         window.makeKeyAndVisible()
+    }
+    
+    @IBAction func switchMode(_ sender: UISwitch) {
+        if sender.isOn {
+            modeSwitch = true
+            print(modeSwitch)
+        }
+        else{
+            modeSwitch = false
+        }
     }
     
     @IBAction func continueTapped(_ sender: Any) {
@@ -104,6 +118,7 @@ class createGroupViewController: UIViewController {
         mainViewController.setting = setting
         mainViewController.num_students = student_num
         mainViewController.groupName = groupName
+        mainViewController.modeSwitch = modeSwitch
         navigationController?.pushViewController(mainViewController, animated: true)
     }
 }

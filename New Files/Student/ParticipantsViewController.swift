@@ -6,7 +6,7 @@ class ParticipantsViewController: UIViewController{
     //tableSettings
     
     public var setting:registeredSetting?
-    
+    public var modeSwitch = false
     public var num_students = 0
     public var groupName = ""
     //-----
@@ -53,6 +53,7 @@ class ParticipantsViewController: UIViewController{
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        print(modeSwitch)
         view.backgroundColor = .white
         title = "Set the table"
         continueBtn.addTarget(self, action: #selector(didTapContinue), for: .touchUpInside)
@@ -141,10 +142,7 @@ class ParticipantsViewController: UIViewController{
         tenImageView.isUserInteractionEnabled = true
         
         self.view.isUserInteractionEnabled = true
-        //        subView.isUserInteractionEnabled = true
-        //        imageView.isUserInteractionEnabled = true
         
-        //Add Drop interaction for DropImageView
         firstImageView.addInteraction(dropInteraction1)
         secondImageView.addInteraction(dropInteraction2)
         thirdImageView.addInteraction(dropInteraction3)
@@ -203,11 +201,12 @@ class ParticipantsViewController: UIViewController{
         let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
         let mainViewController = storyBoard.instantiateViewController(withIdentifier: "discussionFlowView") as! DiscussionViewController
         
+        
         mainViewController.setting = setting
         mainViewController.tableSetting = disucssionTable
         mainViewController.names = nameSetting
         mainViewController.discussionId = discussion_id
-        
+        mainViewController.modeSwitch = modeSwitch
         navigationController?.pushViewController(mainViewController, animated: true)
     }
     
