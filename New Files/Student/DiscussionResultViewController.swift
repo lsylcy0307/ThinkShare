@@ -19,14 +19,30 @@ struct Setup {
     let tableSetting: [Int]
 }
 
+struct DiscResult {
+    let FrequencyDistribution: [Int]
+    let SpeakTimeDistribution: [Int]
+    let finishTime: Int
+    let startTime: Int
+    let UsedQuestions: [String]
+    let responseTypeCnt: [Int]
+}
+
+
 class DiscussionResultViewController: UIViewController {
     var discussionId = ""
     var discussionFlows = [flow]()
     var discussionSetup: Setup?
+    var discussionResult: DiscResult?
     let responseTypes = ["agreement", "change", "expand", "disagreement"]
-//    var speakTime = [Int]()
-//    var speakFrequency = [Int]()
+    var speakTime = [Int]()
+    var initialTime = Int()
+    var finishTime = Int()
+    var speakFrequency = [Int]()
     var responseTypeCnt = [Int]()
+    var usedquestions = [String]()
+    var names = ["","","","","","","","", "","","","", "","","",""]
+    var tableNames = [String]()
     
 
     override func viewDidLoad() {
@@ -46,50 +62,68 @@ class DiscussionResultViewController: UIViewController {
             switch result {
             case .success(let setup):
                 self?.discussionSetup = setup
-//                print(self?.discussionSetup)
                 self?.getDiscussionFlow()
+                self?.getDiscussionResult()
             case .failure(let error):
                 print("failed to get flows: \(error)")
             }
         })
+        
+        
     }
     
     
     private func getDiscussionFlow(){
-        DatabaseManager.shared.getDiscussionFlow(with: discussionId, completion: { [weak self]result in
+        DatabaseManager.shared.getDiscussionFlow(with: discussionId, completion: { [weak self] result in
             switch result {
             case .success(let flows):
                 self?.discussionFlows = flows
-                print(flows)
+            case .failure(let error):
+                print("failed to get flows: \(error)")
+            }
+        })
+    }
+    
+    private func getDiscussionResult(){
+        DatabaseManager.shared.getDiscussionResult(with: discussionId, completion: { [weak self] result in
+            switch result {
+            case .success(let result):
+                self?.discussionResult = result
+                self?.interpretFlow()
             case .failure(let error):
                 print("failed to get flows: \(error)")
             }
         })
         
-//        interpretFlow()
     }
     
     func interpretFlow(){
-        
-//        var speaksFrequency = [Int](count: discussionSetup?.numParticipants, repeatedValue: 0)
-//        var speakTime = [Int](count: discussionSetup?.numParticipants, repeatedValue: 0)
-//
-        for flow in discussionFlows{
-            for response in flow.responseType {
-                if (response == "agreement"){
-                    responseTypeCnt[0]+=1
-                }
-                else if (response == "change"){
-                    responseTypeCnt[1]+=1
-                }
-                else if (response == "expand"){
-                    responseTypeCnt[2]+=1
-                }
-                else if (response == "disagreement"){
-                    responseTypeCnt[3]+=1
-                }
-            }
+        var cnt = 0
+        for i in discussionSetup!.tableSetting {
+            names[i-1] = discussionSetup!.names[cnt]
+            cnt += 1
         }
+        speakFrequency = self.discussionResult!.FrequencyDistribution
+        speakTime = self.discussionResult!.SpeakTimeDistribution
+        usedquestions = self.discussionResult!.UsedQuestions
+        responseTypeCnt = self.discussionResult!.responseTypeCnt
+        initialTime = self.discussionResult!.startTime
+        finishTime = self.discussionResult!.finishTime
+        
+        let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
+        let resultVC = storyBoard.instantiateViewController(withIdentifier: "resultView") as! ResultViewController
+        
+        resultVC.tableName = names
+        resultVC.speakFrequency = speakFrequency
+        resultVC.discussionId = discussionId
+        resultVC.speakTime = speakTime
+        resultVC.questions = usedquestions
+        resultVC.initialTime = initialTime
+        resultVC.finishTime = finishTime
+        resultVC.responseTypeCnt = responseTypeCnt
+        
+        resultVC.modalPresentationStyle = .overFullScreen
+        self.present(resultVC, animated: true, completion: nil)
     }
 
 }

@@ -167,8 +167,8 @@ extension DatabaseManager{
                 guard let identity = user["identity"] as? String,
                       let name = user["name"] as? String,
                       let email = user["email"] as? String else{
-                    return
-                }
+                          return
+                      }
                 if identity == "Teacher" {
                     print("teacher")
                     guard let settings = user["registeredSettings"] as? [[String:String]] else{
@@ -262,9 +262,9 @@ extension DatabaseManager{
                 var discussionSetting = [[String:Any]]()
                 for setting in data {
                     let newSettingData: [String:Any] =
-                        ["textName":setting.textName,
-                         "textLink":setting.textLink,
-                         "questions": setting.questions]
+                    ["textName":setting.textName,
+                     "textLink":setting.textLink,
+                     "questions": setting.questions]
                     discussionSetting.append(newSettingData)
                 }
                 let dataWithCode = ["code":code, "registeredDate":dateString, "texts": discussionSetting] as [String : Any]
@@ -286,9 +286,9 @@ extension DatabaseManager{
                 var discussionSettingData = [[String:Any]]()
                 for setting in data {
                     let newSettingData: [String:Any] =
-                        ["textName":setting.textName,
-                         "textLink":setting.textLink,
-                         "questions": setting.questions]
+                    ["textName":setting.textName,
+                     "textLink":setting.textLink,
+                     "questions": setting.questions]
                     discussionSettingData.append(newSettingData)
                 }
                 let dataWithCode = ["code":code,"registeredDate":dateString, "texts": discussionSettingData] as [String : Any]
@@ -392,6 +392,26 @@ extension DatabaseManager{
         guard let currentEmail = UserDefaults.standard.value(forKey: "email") as? String else {
             return
         }
+        
+        let currentDatetime = Date()
+        let usercalendar = Calendar.current
+        let requestComponents: Set<Calendar.Component> = [
+            .year,
+            .month,
+            .day
+        ]
+        
+        let dateTimeComponents = usercalendar.dateComponents(requestComponents, from: currentDatetime)
+        
+        guard let year = dateTimeComponents.year,
+              let month = dateTimeComponents.month,
+              let day = dateTimeComponents.day else{
+                  return
+              }
+        
+        let date = "\(year)-\(month)-\(day)"
+        print(date)
+        
         let safeEmail = DatabaseManager.safeEmail(emailAddress: currentEmail)
         
         let ref = database.child("\(safeEmail)")
@@ -408,6 +428,7 @@ extension DatabaseManager{
             
             let newDiscussionData: [String: Any] = [
                 "id": discussionId,
+                "date":date,
                 "setting_code": setting_code,
                 "teacher_email": teacherEmail,
                 "teacherName": teacherName,
@@ -492,16 +513,16 @@ extension DatabaseManager{
                 guard let code = dictionary["code"] as? String,
                       let texts = dictionary["texts"] as? [[String:Any]],
                       let date = dictionary["registeredDate"] as? String else {
-                    print("nil")
-                    return nil
-                }
+                          print("nil")
+                          return nil
+                      }
                 var settings = [discussionSetting]()
                 for text in texts {
                     guard let questions = text["questions"] as? [String],
                           let textLink = text["textLink"] as? String,
                           let textName = text["textName"] as? String else{
-                        return nil
-                    }
+                              return nil
+                          }
                     settings.append(discussionSetting(textName: textName, textLink: textLink, questions: questions))
                 }
                 print("ready to send")
@@ -515,7 +536,7 @@ extension DatabaseManager{
     }
     
     
-    public func recordDiscussionResult(with discussionId:String, speakFrequency: [Int], speakTime: [Int], usedQuestions:[String], initialTime: Int, finishTime:Int, completion: @escaping (Bool) -> Void){
+    public func recordDiscussionResult(with discussionId:String, speakFrequency: [Int], speakTime: [Int], usedQuestions:[String], initialTime: Int, finishTime:Int, responseTypeCnt:[Int], completion: @escaping (Bool) -> Void){
         
         let start_Time = timerFormat(seconds: initialTime)
         let startTimeString = makeTimeString(minutes: start_Time.0, seconds: start_Time.1)
@@ -536,8 +557,11 @@ extension DatabaseManager{
                 "FrequencyDistribution": speakFrequency,
                 "startTime": startTimeString,
                 "finishTime": endTimeString,
+                "startTime_int":initialTime,
+                "endTime_int":finishTime,
                 "SpeakTimeDistribution": speakTime,
-                "UsedQuestions": usedQuestions
+                "UsedQuestions": usedQuestions,
+                "responseTypeCnt": responseTypeCnt
             ]
             
             if var result = userNode["discussionResult"] as? [[String:Any]]{
@@ -651,7 +675,7 @@ extension DatabaseManager{
                     print("could not fetch the setting")
                     return
                 }
-//                print(discussionSetting)
+                //                print(discussionSetting)
                 let setup = Setup(date: date, groupName: groupName, id: discussionID, settingCode: settingCode, teacherName: teacherName, names: discussionSetting["name_setting"] as! [String], numParticipants: discussionSetting["num_students"] as! Int, tableSetting: discussionSetting["table_setting"] as! [Int])
                 completion(.success(setup))
                 return
@@ -675,14 +699,37 @@ extension DatabaseManager{
                       let duration = dictionary["duration"] as? String,
                       let startTime = dictionary["startTime"] as? String,
                       let responseType = dictionary["responseType"] as? [String] else {
-                    return nil
-                }
-                print(name)
-                
+                          return nil
+                      }
                 return flow(name: name, duration: duration, endTime: endTime, responseType: responseType, startTime: startTime)
             })
-            print(flows)
             completion(.success(flows))
+        })
+        
+    }
+    
+    public func getDiscussionResult(with discussionId:String, completion: @escaping (Result<DiscResult, Error>) -> Void){
+        
+        database.child("\(discussionId)/discussionResult").observe(.value, with: { snapshot in
+            guard let value = snapshot.value as? [String: Any] else{
+                completion(.failure(DatabaseError.failedToFetch))
+                return
+            }
+            //            print(value)
+            
+            guard let fdist = value["FrequencyDistribution"] as? [Int],
+                  let sdist = value["SpeakTimeDistribution"] as? [Int],
+                  let questions = value["UsedQuestions"] as? [String],
+                  let finishTime = value["endTime_int"] as? Int,
+                  let startTime = value["startTime_int"] as? Int,
+                  let responseTypeCnt = value["responseTypeCnt"] as? [Int]
+            else {
+                return
+            }
+            
+            let result = DiscResult(FrequencyDistribution: fdist, SpeakTimeDistribution: sdist, finishTime: finishTime, startTime: startTime, UsedQuestions: questions, responseTypeCnt: responseTypeCnt)
+            
+            completion(.success(result))
         })
         
     }
@@ -694,18 +741,17 @@ extension DatabaseManager{
                 return
             }
             
-            let discussions: [discussionHistory] = value.compactMap({ dictionary in
+            let settings: [discussionHistory] = value.compactMap({ dictionary in
                 guard let name = dictionary["group_name"] as? String,
                       let id = dictionary["id"] as? String,
                       let date = dictionary["date"] as? String else {
-                    print("nil")
-                    return nil
-                }
+                          print("!")
+                          return nil
+                      }
                 
                 return discussionHistory(code: id, name: name, date: date)
             })
-            
-            completion(.success(discussions))
+            completion(.success(settings))
         })
     }
     
@@ -720,9 +766,9 @@ extension DatabaseManager{
                 guard let code = dictionary["code"] as? String,
                       let teacherEmail = dictionary["email"] as? String,
                       let teacherName = dictionary["name"] as? String else {
-                    print("nil")
-                    return nil
-                }
+                          print("nil")
+                          return nil
+                      }
                 
                 return registeredSetting(code: code, teacherEmail: teacherEmail, teacherName: teacherName)
             })
@@ -745,7 +791,7 @@ extension DatabaseManager{
     private func timerFormat(seconds: Int) -> (Int, Int){
         return ((seconds/60),(seconds % 60)) //min , seconds
     }
-
+    
     private func makeTimeString(minutes: Int, seconds: Int) -> String{
         var timeString = ""
         timeString += String(format: "%02d", minutes)
@@ -754,6 +800,38 @@ extension DatabaseManager{
         return timeString
     }
     
+    public func deleteDiscussionHistory(discussionId: String, completion: @escaping (Bool) -> Void) {
+        guard let email = UserDefaults.standard.value(forKey: "emai") as? String else{
+                return
+        }
+        print("deleting one with id : \(discussionId)")
+        
+        let safeEmail = DatabaseManager.safeEmail(emailAddress: email)
+        let ref = database.child("\(safeEmail)/discussions")
+        ref.observeSingleEvent(of: .value) {snapshot in
+            if var discussions = snapshot.value as? [[String: Any]] {
+                var positionToRemove = 0
+                for discussion in discussions {
+                    if let id  = discussion["id"] as? String,
+                       id == discussionId {
+                        print("found convo to delete")
+                        break
+                    }
+                    positionToRemove += 1
+                }
+                
+                discussions.remove(at: positionToRemove)
+                ref.setValue(discussions, withCompletionBlock: {error, _ in
+                    guard error == nil else{
+                        completion(false)
+                        return
+                    }
+                    print("deleted")
+                    completion(true)
+                })
+            }
+        }
+    }
 }
 
 

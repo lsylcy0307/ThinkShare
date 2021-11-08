@@ -68,10 +68,12 @@ class HistoryViewController: UIViewController {
                     self?.noSettingsLabel.isHidden = false
                     return
                 }
+                
+                
                 self?.noSettingsLabel.isHidden = true
                 self?.tableView.isHidden = false
                 self?.discussions = histories
-
+                print(histories)
                 DispatchQueue.main.async {
                     self?.tableView.reloadData()
                 }
@@ -126,5 +128,28 @@ extension HistoryViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat{
         return 90
+    }
+    
+    func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
+        return .delete
+    }
+    
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
+            //begin delete
+            let discussionId = discussions[indexPath.row].code
+            
+            tableView.beginUpdates()
+            
+            DatabaseManager.shared.deleteDiscussionHistory(discussionId: discussionId, completion: { [weak self] success in
+                if success {
+                    self?.discussions.remove(at: indexPath.row)
+                    tableView.deleteRows(at: [indexPath], with: .left)
+                }
+            })
+            
+            tableView.endUpdates()
+            
+        }
     }
 }

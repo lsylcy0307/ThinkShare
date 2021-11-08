@@ -105,22 +105,9 @@ class registerQuestionsViewController: UIViewController, QuestionViewDelegate {
                 questionData.append(question)
             }
         }
-        spinner.show(in: view)
-        NotificationCenter.default.post(name: DiscussionViewController.addQuestionNotification, object: nil, userInfo: ["questions": questionData])
         
-        DatabaseManager.shared.finishCreatingDiscussion(discussionID: discussionId, registeredQs: questionData, completion: {success in
-            if(success){
-                DispatchQueue.main.async {
-                    self.spinner.dismiss()
-                }
-            }
-            else{
-                print("error in adding the discussion")
-                DispatchQueue.main.async {
-                    self.spinner.dismiss()
-                }
-            }
-        })
+        
+        NotificationCenter.default.post(name: DiscussionViewController.addQuestionNotification, object: nil, userInfo: ["questions": questionData])
         
         self.navigationController?.dismiss(animated: true, completion: nil)
         

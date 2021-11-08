@@ -7,11 +7,11 @@
 
 import UIKit
 import AVFoundation
-
+import JGProgressHUD
 class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
     
     public var setting:registeredSetting?
-    
+    private let spinner = JGProgressHUD(style: .dark)
     public var discussionId = ""
     public var selectedCode = ""
     private var textSelected = false
@@ -44,10 +44,10 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
     var isRecording = false
     var recordingDate = ""
     var tableSetting:[Int] = []
-    var keyNames:[String] = ["Seat1","Seat2","Seat3","Seat4","Seat5","Seat6","Seat7","Seat8","Seat9","Seat10"]
+    var keyNames:[String] = ["Seat1","Seat2","Seat3","Seat4","Seat5","Seat6","Seat7","Seat8","Seat9","Seat10", "Seat11","Seat12","Seat13","Seat14", "Seat15", "Seat16"]
     var names:[String?] = []
     var usedQuestions:[String] = []
-    var buttonEnabes:[Bool] = [false,false,false,false,false,false,false,false,false,false]
+    var buttonEnabes:[Bool] = [false,false,false,false,false,false,false,false,false,false,false,false,false,false, false,false]
     var minute = 0 //initial time
     var second = 0
     var finishedTime = 0
@@ -108,6 +108,12 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
     @IBOutlet weak var name8: UILabel!
     @IBOutlet weak var name9: UILabel!
     @IBOutlet weak var name10: UILabel!
+    @IBOutlet weak var name11: UILabel!
+    @IBOutlet weak var name12: UILabel!
+    @IBOutlet weak var name13: UILabel!
+    @IBOutlet weak var name14: UILabel!
+    @IBOutlet weak var name15: UILabel!
+    @IBOutlet weak var name16: UILabel!
     
     @IBOutlet weak var Seat1: UIButton!
     @IBOutlet weak var Seat2: UIButton!
@@ -119,28 +125,14 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
     @IBOutlet weak var Seat8: UIButton!
     @IBOutlet weak var Seat9: UIButton!
     @IBOutlet weak var Seat10: UIButton!
-    @IBOutlet weak var table: UIImageView!
+    @IBOutlet weak var Seat11: UIButton!
+    @IBOutlet weak var Seat12: UIButton!
+    @IBOutlet weak var Seat13: UIButton!
+    @IBOutlet weak var Seat14: UIButton!
+    @IBOutlet weak var Seat15: UIButton!
+    @IBOutlet weak var Seat16: UIButton!
     
-    @IBOutlet weak var react1a: UIButton!
-    @IBOutlet weak var react1b: UIButton!
-    @IBOutlet weak var react2a: UIButton!
-    @IBOutlet weak var react2b: UIButton!
-    @IBOutlet weak var react3a: UIButton!
-    @IBOutlet weak var react3b: UIButton!
-    @IBOutlet weak var react4a: UIButton!
-    @IBOutlet weak var react4b: UIButton!
-    @IBOutlet weak var react5a: UIButton!
-    @IBOutlet weak var react5b: UIButton!
-    @IBOutlet weak var react6a: UIButton!
-    @IBOutlet weak var react6b: UIButton!
-    @IBOutlet weak var react7a: UIButton!
-    @IBOutlet weak var react7b: UIButton!
-    @IBOutlet weak var react8a: UIButton!
-    @IBOutlet weak var react8b: UIButton!
-    @IBOutlet weak var react9a: UIButton!
-    @IBOutlet weak var react9b: UIButton!
-    @IBOutlet weak var react10a: UIButton!
-    @IBOutlet weak var react10b: UIButton!
+    @IBOutlet weak var table: UIImageView!
     
     @IBOutlet weak var agreementBtn: UIButton!
     @IBOutlet weak var changeBtn: UIButton!
@@ -157,14 +149,12 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
     
     var tableConfig = [Int:UIImage]()
     var buttons = [UIButton]()
-    var reactAButtons = [UIButton]()
-    var reactBButtons = [UIButton]()
     var partNames = [UILabel]()
     var tableNames = [String]()
     
     var responseTypeCnt: [Int] = [0,0,0,0]
-    var speakingTime:[Int] = [0,0,0,0,0,0,0,0,0,0,0]
-    var frequencySpeak:[Int] = [0,0,0,0,0,0,0,0,0,0,0]
+    var speakingTime:[Int] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+    var frequencySpeak:[Int] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
     
     //recording ---
     public static let dateFormatter: DateFormatter = {
@@ -183,7 +173,10 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
     //start disucssion -> register question -> set timer/choose questions
     
     @IBOutlet weak var recordButton: UIButton!
+    
+    
     override func viewDidLoad() {
+        
         super.viewDidLoad()
         view.backgroundColor = .white
         let date = Date()
@@ -210,21 +203,12 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
         
         NotificationCenter.default.addObserver(self, selector: #selector(on_Q_Notification(notification:)), name: DiscussionViewController.questionNotification, object: nil)
         
-        self.partNames = [self.name1, self.name2, self.name3, self.name4, self.name5, self.name6, self.name7, self.name8, self.name9, self.name10]
+        self.partNames = [self.name1, self.name2, self.name3, self.name4, self.name5, self.name6, self.name7, self.name8, self.name9, self.name10, self.name11, self.name12, self.name13, self.name14, self.name15, self.name16]
         
-        self.buttons = [self.Seat1, self.Seat2, self.Seat3, self.Seat4, self.Seat5, self.Seat6, self.Seat7, self.Seat8, self.Seat9, self.Seat10]
+        self.buttons = [self.Seat1, self.Seat2, self.Seat3, self.Seat4, self.Seat5, self.Seat6, self.Seat7, self.Seat8, self.Seat9, self.Seat10, self.Seat11, self.Seat12, self.Seat13, self.Seat14,self.Seat15, self.Seat16 ]
         
-        self.reactAButtons = [react1a,react2a,react3a,react4a,react5a,react6a,react7a,react8a,react9a,react10a]
-        
-        self.reactBButtons = [react1b,react2b,react3b,react4b,react5b,react6b,react7b,react8b,react9b,react10b]
         
         for btn in self.buttons{
-            btn.isEnabled = false
-        }
-        for btn in self.reactAButtons{
-            btn.isEnabled = false
-        }
-        for btn in self.reactBButtons{
             btn.isEnabled = false
         }
         
@@ -361,7 +345,13 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
         }
         
         if let dict = notification.userInfo as NSDictionary? {
-            if let question = dict["question"] as? String{
+            if let question = dict["question"] as? String,
+               let newQuestions = dict["new_questions"] as? [String]
+            {
+                for i in newQuestions {
+                    selectedQuestions.append(i)
+                    registeredQuestions.append(i)
+                }
                 usedQuestions.append(question)
                 self.currentQuestion = question
                 startStopClicked()
@@ -422,7 +412,7 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
     
     //setting buttons with users
     func setTable(){
-        tableConfig = [1: UIImage(named: "chair1")!, 2: UIImage(named: "chair1")!, 3: UIImage(named: "chair1")!, 4: UIImage(named: "chair2")!,5: UIImage(named: "chair2")!,6: UIImage(named: "chair4")!,7: UIImage(named: "chair4")!,8: UIImage(named: "chair4")!,9: UIImage(named: "chair3")!,10: UIImage(named: "chair3")!]
+        tableConfig = [1: UIImage(named: "chair1")!, 2: UIImage(named: "chair1")!, 3: UIImage(named: "chair1")!, 4: UIImage(named: "chair1")!,5: UIImage(named: "chair1")!,6: UIImage(named: "chair2")!,7: UIImage(named: "chair2")!,8: UIImage(named: "chair2")!,9: UIImage(named: "chair4")!,10: UIImage(named: "chair4")!, 11: UIImage(named: "chair4")!, 12: UIImage(named: "chair4")!, 13: UIImage(named: "chair4")!, 14: UIImage(named: "chair3")!, 15: UIImage(named: "chair3")!, 16: UIImage(named: "chair3")!]
         var cnt = 0
         for i in tableSetting {
             tableConfig[i] = UIImage(named: "Boy")
@@ -434,10 +424,6 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
             self.buttons[element-1].setImage(image, for: .normal)
             self.buttons[element-1].isEnabled = buttonEnabes[element-1]
             self.buttons[element-1].imageView?.contentMode = .scaleAspectFit
-            self.reactAButtons[element-1].isHidden = !buttonEnabes[element-1]
-            self.reactBButtons[element-1].isHidden = !buttonEnabes[element-1]
-            self.reactAButtons[element-1].isEnabled = buttonEnabes[element-1]
-            self.reactBButtons[element-1].isEnabled = buttonEnabes[element-1]
         }
         
         for name in partNames{
@@ -479,6 +465,18 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
             selectedBtn = Seat9
         case 10:
             selectedBtn = Seat10
+        case 11:
+            selectedBtn = Seat11
+        case 12:
+            selectedBtn = Seat12
+        case 13:
+            selectedBtn = Seat13
+        case 14:
+            selectedBtn = Seat14
+        case 15:
+            selectedBtn = Seat15
+        case 16:
+            selectedBtn = Seat16
         default:
             print("default btn")
             
@@ -487,37 +485,6 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
         setShadow(button: selectedBtn)
         buttonTapped(selectedBtn: selectedBtn)
         
-    }
-    
-    @IBAction func responseAbtnClick(_ sender: UIButton) {
-        var selectedRespABtn = UIButton()
-        switch sender.tag{
-        case 1:
-            selectedRespABtn = react1a
-        case 2:
-            selectedRespABtn = react2a
-        case 3:
-            selectedRespABtn = react3a
-        case 4:
-            selectedRespABtn = react4a
-        case 5:
-            selectedRespABtn = react5a
-        case 6:
-            selectedRespABtn = react6a
-        case 7:
-            selectedRespABtn = react7a
-        case 8:
-            selectedRespABtn = react8a
-        case 9:
-            selectedRespABtn = react9a
-        case 10:
-            selectedRespABtn = react10a
-        default:
-            print("default btn")
-            
-        }
-        selectedRespABtn.isEnabled = false
-        responseList.append(partNames[sender.tag-1].text!)
     }
     
     @IBAction func responseTypePushed(_ sender: UIButton) {
@@ -544,7 +511,6 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
             print("default btn")
             
         }
-        print(type)
         selectedRespBtn.isEnabled = false
         response_type.append(responsetypes[sender.tag-1])
         
@@ -561,37 +527,6 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
                 firstresponseType = true
             }
         }
-    }
-    
-    @IBAction func responseBbtnClick(_ sender: UIButton) {
-        var selectedRespBBtn = UIButton()
-        switch sender.tag{
-        case 1:
-            selectedRespBBtn = react1b
-        case 2:
-            selectedRespBBtn = react2b
-        case 3:
-            selectedRespBBtn = react3b
-        case 4:
-            selectedRespBBtn = react4b
-        case 5:
-            selectedRespBBtn = react5b
-        case 6:
-            selectedRespBBtn = react6b
-        case 7:
-            selectedRespBBtn = react7b
-        case 8:
-            selectedRespBBtn = react8b
-        case 9:
-            selectedRespBBtn = react9b
-        case 10:
-            selectedRespBBtn = react10b
-        default:
-            print("default btn")
-            
-        }
-        selectedRespBBtn.isEnabled = false
-        responseBList.append(partNames[sender.tag-1].text!)
     }
     
     func setShadow(button: UIButton){
@@ -711,7 +646,6 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
     }
     
     func addLine(toPoint end:CGPoint, lineType:String, type: Int) {
-        print("adding line")
         let line = CAShapeLayer()
         let linePath = UIBezierPath()
         
@@ -791,6 +725,24 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
         }
     }
     
+    func addRegistered(){
+        spinner.show(in: view)
+        print(registeredQuestions)
+        DatabaseManager.shared.finishCreatingDiscussion(discussionID: discussionId, registeredQs: registeredQuestions, completion: {success in
+                    if(success){
+                        DispatchQueue.main.async {
+                            self.spinner.dismiss()
+                        }
+                    }
+                    else{
+                        print("error in adding the discussion")
+                        DispatchQueue.main.async {
+                            self.spinner.dismiss()
+                        }
+                    }
+                })
+    }
+    
     @objc func timerCounter() -> Void {
         
         if(count==time_fourth && numParticipants >= 5){
@@ -824,6 +776,7 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
     func discussionEnded(){
         finishedTime = count
         
+        addRegistered()
         let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
         let resultVC = storyBoard.instantiateViewController(withIdentifier: "resultView") as! ResultViewController
         
@@ -842,7 +795,7 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
             resultVC.filename = self.fileName
         }
         
-        DatabaseManager.shared.recordDiscussionResult(with: discussionId, speakFrequency: frequencySpeak, speakTime: speakingTime, usedQuestions: usedQuestions, initialTime: initialTime, finishTime: finishedTime, completion: {success in
+        DatabaseManager.shared.recordDiscussionResult(with: discussionId, speakFrequency: frequencySpeak, speakTime: speakingTime, usedQuestions: usedQuestions, initialTime: initialTime, finishTime: finishedTime, responseTypeCnt: responseTypeCnt, completion: {success in
             if(success){
 //                print("success")
             }
@@ -888,10 +841,6 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
     }
     
     func resetBtn(){
-        for (element, _) in tableConfig {
-            self.reactAButtons[element-1].isEnabled = buttonEnabes[element-1]
-            self.reactBButtons[element-1].isEnabled = buttonEnabes[element-1]
-        }
         agreementBtn.isEnabled = true
         disagreementBtn.isEnabled = true
         expandingBtn.isEnabled = true

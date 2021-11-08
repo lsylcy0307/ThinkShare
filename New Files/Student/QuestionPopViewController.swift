@@ -13,9 +13,12 @@ class QuestionPopViewController: UIViewController {
     @IBOutlet weak var Reset: UIButton!
     @IBOutlet weak var stackView: UIStackView!
     
+    @IBOutlet weak var setTimerStack: UIStackView!
+    @IBOutlet weak var questionField: UITextField!
     private var selectedQ = String()
     public var selectedQuestions = [String]()
     private var questions = [String]()
+    private var newquestions = [String]()
     
     var firstq = false
     var usedquestions = [String]()
@@ -24,6 +27,7 @@ class QuestionPopViewController: UIViewController {
     @IBOutlet weak var collectionView: UICollectionView!
     
     override func viewDidLoad() {
+        newquestions = []
         minuteLabel.text = "05"
         super.viewDidLoad()
         
@@ -33,10 +37,10 @@ class QuestionPopViewController: UIViewController {
         print(usedquestions)
         
         if firstq == false{
-            stackView.isHidden = false
+            setTimerStack.isHidden = false
         }
         else if firstq == true{
-            stackView.isHidden = true
+            setTimerStack.isHidden = true
         }
         
         collectionView.delegate = self
@@ -44,6 +48,15 @@ class QuestionPopViewController: UIViewController {
         
         self.loadQuestions()
     }
+    
+    @IBAction func addQuestion(_ sender: Any) {
+        let question = questionField.text!
+        newquestions.append(question)
+        questions.append(question)
+        collectionView.reloadData()
+        questionField.text = ""
+    }
+    
     
     @IBAction func addMin(_ sender: Any) {
         var minTime = ""
@@ -97,7 +110,7 @@ extension QuestionPopViewController: UICollectionViewDelegate, UICollectionViewD
         collectionView.deselectItem(at: indexPath, animated: true)
         selectedQ = questions[indexPath.row]
         
-        NotificationCenter.default.post(name: DiscussionViewController.questionNotification, object: nil, userInfo: ["question": selectedQ])
+        NotificationCenter.default.post(name: DiscussionViewController.questionNotification, object: nil, userInfo: ["question": selectedQ, "new_questions": newquestions])
         
         if firstq == false {
             callback?(minute)

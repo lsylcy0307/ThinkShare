@@ -209,8 +209,6 @@ class ResultViewController: UIViewController, ChartViewDelegate, UITableViewDele
                 pieEntries.append(pieEntry)
                 nonZeroTableName.append(tableName[cnt])
                 nonZeroSpeakTime.append(value)
-                print(nonZeroTableName)
-                print(nonZeroSpeakTime)
             }
             cnt+=1
         }
@@ -340,11 +338,9 @@ class ResultViewController: UIViewController, ChartViewDelegate, UITableViewDele
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if tableView == self.tableView
         {
-            print("\(responseTypeCnt[indexPath.row]) selected")
             tableView.deselectRow(at: indexPath, animated: false)
         }
         else {
-            print("\(questions[indexPath.row]) selected")
             tableView.deselectRow(at: indexPath, animated: false)
         }
     }

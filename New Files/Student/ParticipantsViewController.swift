@@ -7,7 +7,7 @@ class ParticipantsViewController: UIViewController{
     
     public var setting:registeredSetting?
     public var modeSwitch = false
-    public var num_students = 0
+    public var num_students = 0 //number of participants
     public var groupName = ""
     //-----
     var totalParticipants:Int?
@@ -39,6 +39,12 @@ class ParticipantsViewController: UIViewController{
     @IBOutlet weak var name8: UILabel!
     @IBOutlet weak var name9: UILabel!
     @IBOutlet weak var name10: UILabel!
+    @IBOutlet weak var name11: UILabel!
+    @IBOutlet weak var name12: UILabel!
+    @IBOutlet weak var name13: UILabel!
+    @IBOutlet weak var name14: UILabel!
+    @IBOutlet weak var name15: UILabel!
+    @IBOutlet weak var name16: UILabel!
     
     @IBOutlet weak var firstImageView: UIImageView!
     @IBOutlet weak var secondImageView: UIImageView!
@@ -50,6 +56,12 @@ class ParticipantsViewController: UIViewController{
     @IBOutlet weak var eightImageView: UIImageView!
     @IBOutlet weak var nighImageView: UIImageView!
     @IBOutlet weak var tenImageView: UIImageView!
+    @IBOutlet weak var elevenImageView: UIImageView!
+    @IBOutlet weak var twelveImageView: UIImageView!
+    @IBOutlet weak var thirteenImageView: UIImageView!
+    @IBOutlet weak var sixteenImageView: UIImageView!
+    @IBOutlet weak var fifteenImageView: UIImageView!
+    @IBOutlet weak var fourteenImageView: UIImageView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -116,6 +128,7 @@ class ParticipantsViewController: UIViewController{
         let dragInteraction8 = UIDragInteraction(delegate: self)
         dragInteraction8.isEnabled = true
         
+        
         let dropInteraction1 = UIDropInteraction(delegate: self)
         let dropInteraction2 = UIDropInteraction(delegate: self)
         let dropInteraction3 = UIDropInteraction(delegate: self)
@@ -126,6 +139,12 @@ class ParticipantsViewController: UIViewController{
         let dropInteraction8 = UIDropInteraction(delegate: self)
         let dropInteraction9 = UIDropInteraction(delegate: self)
         let dropInteraction10 = UIDropInteraction(delegate: self)
+        let dropInteraction11 = UIDropInteraction(delegate: self)
+        let dropInteraction12 = UIDropInteraction(delegate: self)
+        let dropInteraction13 = UIDropInteraction(delegate: self)
+        let dropInteraction14 = UIDropInteraction(delegate: self)
+        let dropInteraction15 = UIDropInteraction(delegate: self)
+        let dropInteraction16 = UIDropInteraction(delegate: self)
         
         collectionView.dragDelegate = self
         collectionView.dragInteractionEnabled = true
@@ -140,6 +159,12 @@ class ParticipantsViewController: UIViewController{
         eightImageView.isUserInteractionEnabled = true
         nighImageView.isUserInteractionEnabled = true
         tenImageView.isUserInteractionEnabled = true
+        elevenImageView.isUserInteractionEnabled = true
+        twelveImageView.isUserInteractionEnabled = true
+        thirteenImageView.isUserInteractionEnabled = true
+        sixteenImageView.isUserInteractionEnabled = true
+        fifteenImageView.isUserInteractionEnabled = true
+        fourteenImageView.isUserInteractionEnabled = true
         
         self.view.isUserInteractionEnabled = true
         
@@ -153,6 +178,12 @@ class ParticipantsViewController: UIViewController{
         eightImageView.addInteraction(dropInteraction8)
         nighImageView.addInteraction(dropInteraction9)
         tenImageView.addInteraction(dropInteraction10)
+        elevenImageView.addInteraction(dropInteraction11)
+        twelveImageView.addInteraction(dropInteraction12)
+        thirteenImageView.addInteraction(dropInteraction13)
+        sixteenImageView.addInteraction(dropInteraction16)
+        fifteenImageView.addInteraction(dropInteraction15)
+        fourteenImageView.addInteraction(dropInteraction14)
     }
     
     
@@ -310,6 +341,31 @@ extension ParticipantsViewController : UIDropInteractionDelegate{
                 dropOperation = .copy
                 selectedFinger = 10
             }
+            else if  elevenImageView.frame.contains(location) {
+                dropOperation = .copy
+                selectedFinger = 11
+            }
+            else if  twelveImageView.frame.contains(location) {
+                dropOperation = .copy
+                selectedFinger = 12
+            }
+            else if  thirteenImageView.frame.contains(location) {
+                dropOperation = .copy
+                selectedFinger = 13
+            }
+            else if  fourteenImageView.frame.contains(location) {
+                dropOperation = .copy
+                selectedFinger = 14
+            }
+            else if  fifteenImageView.frame.contains(location) {
+                dropOperation = .copy
+                selectedFinger = 15
+            }
+            else if  sixteenImageView.frame.contains(location) {
+                dropOperation = .copy
+                selectedFinger = 16
+            }
+            
             else {
                 dropOperation = .cancel
                 selectedFinger = 0
@@ -389,6 +445,42 @@ extension ParticipantsViewController : UIDropInteractionDelegate{
                         self.name10.text = self.names[self.selectedIndex]
                         self.nameSetting.append(self.names[self.selectedIndex])
                         self.disucssionTable.append(10)
+                        break
+                    case 11 :
+                        self.elevenImageView.image = images.last
+                        self.name11.text = self.names[self.selectedIndex]
+                        self.nameSetting.append(self.names[self.selectedIndex])
+                        self.disucssionTable.append(11)
+                        break
+                    case 12 :
+                        self.twelveImageView.image = images.last
+                        self.name12.text = self.names[self.selectedIndex]
+                        self.nameSetting.append(self.names[self.selectedIndex])
+                        self.disucssionTable.append(12)
+                        break
+                    case 13 :
+                        self.thirteenImageView.image = images.last
+                        self.name13.text = self.names[self.selectedIndex]
+                        self.nameSetting.append(self.names[self.selectedIndex])
+                        self.disucssionTable.append(13)
+                        break
+                    case 14 :
+                        self.fourteenImageView.image = images.last
+                        self.name14.text = self.names[self.selectedIndex]
+                        self.nameSetting.append(self.names[self.selectedIndex])
+                        self.disucssionTable.append(14)
+                        break
+                    case 15 :
+                        self.fifteenImageView.image = images.last
+                        self.name15.text = self.names[self.selectedIndex]
+                        self.nameSetting.append(self.names[self.selectedIndex])
+                        self.disucssionTable.append(15)
+                        break
+                    case 16 :
+                        self.sixteenImageView.image = images.last
+                        self.name16.text = self.names[self.selectedIndex]
+                        self.nameSetting.append(self.names[self.selectedIndex])
+                        self.disucssionTable.append(16)
                         break
                     default:
                         print("exit")
