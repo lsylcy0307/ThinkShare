@@ -527,6 +527,9 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
                 firstresponseType = true
             }
         }
+        else if (modeSwitch == false){
+            //if not reflection mode
+        }
     }
     
     func setShadow(button: UIButton){

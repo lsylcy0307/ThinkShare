@@ -8,9 +8,12 @@ import UIKit
 import FirebaseAuth
 import JGProgressHUD
 
+protocol TeacherHomeViewControllerDelegate: AnyObject {
+    func didTapMenuButton()
+}
 
 class DiscussionListViewController: UIViewController {
-    
+    weak var delegate: TeacherHomeViewControllerDelegate?
     private let spinner = JGProgressHUD(style: .dark)
     
     private var discussions = [Setting]()
@@ -35,9 +38,11 @@ class DiscussionListViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        title = "Home"
+        navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "list.dash"), style: .done, target: self, action: #selector(TapMenuButton))
         
-        let add = UIBarButtonItem(title: "Back", style: .plain, target: self, action: #selector(addTapped))
-        navigationItem.leftBarButtonItem = add
+        let add = UIBarButtonItem(title: "create", style: .plain, target: self, action: #selector(addTapped))
+        navigationItem.rightBarButtonItem = add
         
         view.backgroundColor = .white
         
@@ -48,6 +53,11 @@ class DiscussionListViewController: UIViewController {
         
         
     }
+    
+    @objc func TapMenuButton(){
+        delegate?.didTapMenuButton()
+    }
+    
     
     private func setupTableView() {
         tableView.delegate = self
@@ -97,22 +107,10 @@ class DiscussionListViewController: UIViewController {
     }
     
     @objc func addTapped(){
-        
-        guard let identity = UserDefaults.standard.value(forKey: "identity") as? String else {
-            return
-        }
-        if (identity == "Students"){
-            let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
-            let mainViewController = storyBoard.instantiateViewController(withIdentifier: "MenuViewController") as! MenusViewController
-            mainViewController.modalPresentationStyle = .fullScreen
-            self.present(mainViewController, animated: true, completion: nil)
-        }
-        else if (identity == "Teacher"){
-            let vc = TeacherMenuViewController()
-            let nav = UINavigationController(rootViewController: vc)
-            nav.modalPresentationStyle = .fullScreen //don't want user to dismiss the login page
-            self.present(nav, animated: true)
-        }
+        let vc = CreateDiscussionViewController()
+        let navVC = UINavigationController(rootViewController: vc)
+        navVC.modalPresentationStyle = .overFullScreen
+        self.present(navVC, animated: true)
     }
     
 }

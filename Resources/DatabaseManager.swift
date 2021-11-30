@@ -39,6 +39,7 @@ extension DatabaseManager{
     
     public func isTeacher(with email: String,
                           completion: @escaping ((Bool) -> Void)) {
+        print(email)
         database.child(email).observeSingleEvent(of: .value, with: { snapshot in
             guard let user = snapshot.value as? [String: Any] else {
                 completion(false)
@@ -740,6 +741,7 @@ extension DatabaseManager{
                 completion(.failure(DatabaseError.failedToFetch))
                 return
             }
+//            print(value)
             
             let settings: [discussionHistory] = value.compactMap({ dictionary in
                 guard let name = dictionary["group_name"] as? String,
@@ -801,10 +803,10 @@ extension DatabaseManager{
     }
     
     public func deleteDiscussionHistory(discussionId: String, completion: @escaping (Bool) -> Void) {
-        guard let email = UserDefaults.standard.value(forKey: "emai") as? String else{
+        print("deleting one with id : \(discussionId)")
+        guard let email = UserDefaults.standard.value(forKey: "email") as? String else{
                 return
         }
-        print("deleting one with id : \(discussionId)")
         
         let safeEmail = DatabaseManager.safeEmail(emailAddress: email)
         let ref = database.child("\(safeEmail)/discussions")
@@ -827,11 +829,13 @@ extension DatabaseManager{
                         return
                     }
                     print("deleted")
+                    
                     completion(true)
                 })
             }
         }
     }
+    
 }
 
 

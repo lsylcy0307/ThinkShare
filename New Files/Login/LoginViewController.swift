@@ -107,11 +107,14 @@ class LoginViewController: UIViewController {
 
             }
             else if (identity == "Teacher"){
+                
                 print("teacher")
-                let vc = TeacherMenuViewController()
-                let nav = UINavigationController(rootViewController: vc)
-                nav.modalPresentationStyle = .fullScreen //don't want user to dismiss the login page
-                strongSelf.present(nav, animated: true)
+                guard let window = UIApplication.shared.windows.first(where: { $0.isKeyWindow }) else {
+                    return
+                }
+                window.rootViewController = TeacherContainerViewController()
+                window.makeKeyAndVisible()
+
             }
         })
         //once controller dismisses, want to get rid of observation (for memory)
@@ -217,11 +220,11 @@ class LoginViewController: UIViewController {
             }
             else {
                 print("load to a teacher page")
-//                guard let window = UIApplication.shared.windows.first(where: { $0.isKeyWindow }) else {
-//                    return
-//                }
-//                window.rootViewController = ContainerViewController()
-//                window.makeKeyAndVisible()
+                guard let window = UIApplication.shared.windows.first(where: { $0.isKeyWindow }) else {
+                    return
+                }
+                window.rootViewController = TeacherContainerViewController()
+                window.makeKeyAndVisible()
             }
             
             

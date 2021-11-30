@@ -68,7 +68,7 @@ class HistoryViewController: UIViewController {
                     self?.noSettingsLabel.isHidden = false
                     return
                 }
-                
+                print(histories)
                 
                 self?.noSettingsLabel.isHidden = true
                 self?.tableView.isHidden = false
@@ -98,6 +98,8 @@ class HistoryViewController: UIViewController {
 extension HistoryViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        print(discussions.count)
+        print(discussions)
         return discussions.count
     }
     
@@ -138,16 +140,16 @@ extension HistoryViewController: UITableViewDelegate, UITableViewDataSource {
         if editingStyle == .delete {
             //begin delete
             let discussionId = discussions[indexPath.row].code
-            
+            print("tring to delete: \(discussionId)")
             tableView.beginUpdates()
             
             DatabaseManager.shared.deleteDiscussionHistory(discussionId: discussionId, completion: { [weak self] success in
                 if success {
+                    print("success")
                     self?.discussions.remove(at: indexPath.row)
                     tableView.deleteRows(at: [indexPath], with: .left)
                 }
             })
-            
             tableView.endUpdates()
             
         }

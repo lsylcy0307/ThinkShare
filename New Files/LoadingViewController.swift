@@ -61,10 +61,11 @@ class LoadingViewController: UIViewController {
             }
             else if (identity == "Teacher"){
                 print("teacher")
-                let vc = TeacherMenuViewController()
-                let nav = UINavigationController(rootViewController: vc)
-                nav.modalPresentationStyle = .fullScreen //don't want user to dismiss the login page
-                self.present(nav, animated: true)
+                guard let window = UIApplication.shared.windows.first(where: { $0.isKeyWindow }) else {
+                    return
+                }
+                window.rootViewController = TeacherContainerViewController()
+                window.makeKeyAndVisible()
             }
             else {
                 let vc = LoginViewController()

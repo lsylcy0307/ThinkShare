@@ -111,13 +111,17 @@ class CreateDiscussionViewController: UIViewController, TaskViewDelegate {
                 data.append(dataPoint)
             }
         }
-        DatabaseManager.shared.addDiscussionSetting(with: data, completion: {success in
-            if success {
-                print("successfully added the discussion setting")
-                self.backToMain()
-            }
-        })
-        
+        if(data.isEmpty != true){
+            DatabaseManager.shared.addDiscussionSetting(with: data, completion: {success in
+                if success {
+                    print("successfully added the discussion setting")
+                    self.backToMain()
+                }
+            })
+        }
+        else{
+            self.backToMain()
+        }
     }
     
     override func viewDidLayoutSubviews() {
@@ -127,22 +131,8 @@ class CreateDiscussionViewController: UIViewController, TaskViewDelegate {
     
     
     private func backToMain(){
-        
-        guard let identity = UserDefaults.standard.value(forKey: "identity") as? String else {
-            return
-        }
-        if (identity == "Students"){
-            let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
-            let mainViewController = storyBoard.instantiateViewController(withIdentifier: "MenuViewController") as! MenusViewController
-            mainViewController.modalPresentationStyle = .fullScreen
-            self.present(mainViewController, animated: true, completion: nil)
-        }
-        else if (identity == "Teacher"){
-            let vc = TeacherMenuViewController()
-            let nav = UINavigationController(rootViewController: vc)
-            nav.modalPresentationStyle = .fullScreen //don't want user to dismiss the login page
-            self.present(nav, animated: true)
-        }
+        print("dismiss")
+        self.navigationController?.dismiss(animated: true, completion: nil)
     }
     
     func onRemove(_ view: TaskView) {

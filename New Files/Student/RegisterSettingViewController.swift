@@ -67,9 +67,6 @@ class RegisterSettingViewController: UIViewController {
         codeField.delegate = self
         
         
-        let add = UIBarButtonItem(title: "Back", style: .plain, target: self, action: #selector(addTapped))
-        navigationItem.leftBarButtonItem = add
-        
         view.addSubview(scrollView)
         scrollView.addSubview(imageView)
         scrollView.addSubview(codeField)
@@ -79,24 +76,6 @@ class RegisterSettingViewController: UIViewController {
         scrollView.isUserInteractionEnabled = true
     }
     
-    @objc func addTapped(){
-        
-        guard let identity = UserDefaults.standard.value(forKey: "identity") as? String else {
-            return
-        }
-        if (identity == "Students"){
-            let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
-            let mainViewController = storyBoard.instantiateViewController(withIdentifier: "MenuViewController") as! MenusViewController
-            mainViewController.modalPresentationStyle = .fullScreen
-            self.present(mainViewController, animated: true, completion: nil)
-        }
-        else if (identity == "Teacher"){
-            let vc = TeacherMenuViewController()
-            let nav = UINavigationController(rootViewController: vc)
-            nav.modalPresentationStyle = .fullScreen //don't want user to dismiss the login page
-            self.present(nav, animated: true)
-        }
-    }
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
