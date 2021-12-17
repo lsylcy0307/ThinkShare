@@ -14,12 +14,17 @@ class DiscussionHistoryTableViewCell: UITableViewCell {
     private let discussionNameLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 50, weight: .semibold)
+        label.textColor = .black
         return label
     }()
     
     private let dateLabel: UILabel = {
         let label = UILabel()
+        label.layer.cornerRadius = 10
+        label.textAlignment = .center
+        label.backgroundColor = .white
         label.font = .systemFont(ofSize: 25, weight: .regular)
+        label.textColor = UIColor(cgColor: CGColor(red: 106/255, green: 106/255, blue: 106/255, alpha: 1))
         label.numberOfLines = 0
         return label
     }()
@@ -28,7 +33,7 @@ class DiscussionHistoryTableViewCell: UITableViewCell {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         contentView.addSubview(discussionNameLabel)
         contentView.addSubview(dateLabel)
-        self.backgroundColor = UIColor(red: 238/255, green: 130/255, blue: 238/255, alpha: 0.3)
+        self.backgroundColor = UIColor(red: 209/255, green: 243/255, blue: 243/255, alpha: 1)
     }
     
     required init?(coder: NSCoder) {
@@ -40,12 +45,12 @@ class DiscussionHistoryTableViewCell: UITableViewCell {
         
         discussionNameLabel.frame = CGRect(x: 10,
                                      y: 10,
-                                     width: 300,
+                                     width: 500,
                                      height: 60)
-        dateLabel.frame = CGRect(x: discussionNameLabel.right + 20,
-                                     y: 10,
-                                     width: contentView.width - 30 - discussionNameLabel.width,
-                                     height: 30)
+        dateLabel.frame = CGRect(x: contentView.right - 250,
+                                 y: 20,
+                                 width: 200,
+                                 height: 50)
     }
 
     public func configure(with model: discussionHistory) {

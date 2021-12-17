@@ -37,8 +37,8 @@ class NamesView: UIView {
         let textField = UITextField()
         textField.font = UIFont(name: "ArialMT", size: 15)
         textField.backgroundColor = .white
-        textField.layer.cornerRadius = 5
-        textField.layer.borderWidth = 2
+        textField.layer.cornerRadius = 10
+//        textField.layer.borderWidth = 2
         return textField
     }()
     
@@ -48,6 +48,7 @@ class NamesView: UIView {
         btn.setTitle("-", for: .normal)
         btn.setTitleColor(.red, for: .normal)
         btn.layer.borderWidth = 0.3
+        btn.layer.cornerRadius = 10
         btn.layer.borderColor = UIColor.red.cgColor
         let constraint = btn.heightAnchor.constraint(equalToConstant: 30)
         constraint.isActive = true
@@ -76,7 +77,7 @@ class NamesView: UIView {
     init(delegate: NamesViewDelegate) {
         self.delegate = delegate
         super.init(frame: .zero)
-        backgroundColor =  UIColor(red: 203/255, green: 195/255, blue: 227/255, alpha: 1)
+        backgroundColor =  UIColor(red: 255/255, green: 233/255, blue: 156/255, alpha: 1)
         addSubview(stackView)
         stackView.snp.makeConstraints { (make) in
             make.edges.equalToSuperview().inset(UIEdgeInsets(top: 5, left: 10, bottom: 10, right: 10))

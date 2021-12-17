@@ -8,6 +8,12 @@
 import UIKit
 import AVFoundation
 import JGProgressHUD
+
+struct questionSet {
+    let question : String
+    let duration : Int
+}
+
 class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
     
     public var setting:registeredSetting?
@@ -31,10 +37,11 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
     @IBOutlet weak var helpBtn: UIButton!
     @IBOutlet weak var textBtn: UIButton!
     
-    @IBOutlet weak var notification: UILabel!
+//    @IBOutlet weak var notification: UILabel!
     //----
     @IBOutlet weak var currentQuestionLabel: UILabel!
     
+    var firstqStart = 0
     var response_type = [String]()
     var responsetypes = ["agreement", "change", "elaboration", "disagreement"]
     var prev_type_response = ""
@@ -46,7 +53,7 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
     var tableSetting:[Int] = []
     var keyNames:[String] = ["Seat1","Seat2","Seat3","Seat4","Seat5","Seat6","Seat7","Seat8","Seat9","Seat10", "Seat11","Seat12","Seat13","Seat14", "Seat15", "Seat16"]
     var names:[String?] = []
-    var usedQuestions:[String] = []
+    var usedQuestions:[questionSet] = []
     var buttonEnabes:[Bool] = [false,false,false,false,false,false,false,false,false,false,false,false,false,false, false,false]
     var minute = 0 //initial time
     var second = 0
@@ -68,7 +75,6 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
     var secondPoint: CGPoint?
     
     var prevBtn = UIButton()
-    
     
     var SELECTEDBtn = UIButton()
     
@@ -139,6 +145,9 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
     @IBOutlet weak var expandingBtn: UIButton!
     @IBOutlet weak var disagreementBtn: UIButton!
     
+    private var questionStart = 0
+    private var questionEnd = 0
+    
     
     @IBOutlet weak var startButton: UIButton!
     
@@ -179,13 +188,20 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
         
         super.viewDidLoad()
         view.backgroundColor = .white
+        
+        startButton.layer.cornerRadius = 15
+        
+        questionView.layer.cornerRadius = 10
+        questionView.layer.borderWidth = 2
+        questionView.layer.borderColor = UIColor.gray.cgColor
+        
         let date = Date()
         let dateString = CreateDiscussionViewController.dateFormatter.string(from: date)
 //        print("discussion id: \(discussionId), code: \(selectedCode)")
         fileName = "\(discussionId)-Hark-\(dateString).m4a"
         setupRecorder()
         currentQuestionLabel.adjustsFontSizeToFitWidth = true
-        notification.isHidden = true
+//        notification.isHidden = true
         stackView.isHidden = true
         questionView.isHidden = true
         minute = 0
@@ -237,6 +253,22 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
         
         currentPoint = table.center
         setTable()
+        
+        agreementBtn.layer.cornerRadius = 15
+        agreementBtn.layer.borderColor = CGColor(red: 124/255, green: 187/255, blue: 0, alpha: 1)
+        agreementBtn.layer.borderWidth = 5
+        
+        disagreementBtn.layer.cornerRadius = 15
+        disagreementBtn.layer.borderColor = CGColor(red: 246/255, green: 83/255, blue: 20/255, alpha: 1)
+        disagreementBtn.layer.borderWidth = 5
+        
+        expandingBtn.layer.cornerRadius = 15
+        expandingBtn.layer.borderColor = CGColor(red: 255/255, green: 187/255, blue: 0, alpha: 1)
+        expandingBtn.layer.borderWidth = 5
+        
+        changeBtn.layer.cornerRadius = 15
+        changeBtn.layer.borderColor = CGColor(red: 0/255, green: 161/255, blue: 241/255, alpha: 1)
+        changeBtn.layer.borderWidth = 5
         
     }
     
@@ -330,13 +362,41 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
             if let regisQuestions = dict["questions"] as? [String] {
                 self.selectedQuestions.append(contentsOf: regisQuestions)
                 self.registeredQuestions = regisQuestions
+                self.addRegistered()
             }
         }
     }
     
     @objc func on_Q_Notification(notification:Notification)
     {
+        
+        if let dict = notification.userInfo as NSDictionary? {
+            print("called")
+            if let question = dict["question"] as? String,
+               let newQuestions = dict["new_questions"] as? [String],
+               let verystartTime = dict["time"] as? Int
+            {
+                
+                firstqStart = verystartTime * 60
+//                print(firstqStart)
+                
+                for i in newQuestions {
+                    selectedQuestions.append(i)
+                    registeredQuestions.append(i)
+                    //update registered questions
+                }
+                if (receivedFirstQ == true){
+                    usedQuestions.append(questionSet(question: currentQuestion, duration: questionStart-count))
+                }
+                questionStart = count
+                
+                self.currentQuestion = question
+                startStopClicked()
+            }
+        }
+        
         if receivedFirstQ == false{
+            questionStart = firstqStart
             receivedFirstQ = true
             startButton.isHidden = true
             stackView.isHidden = false
@@ -344,20 +404,9 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
             startDiscussion()
         }
         
-        if let dict = notification.userInfo as NSDictionary? {
-            if let question = dict["question"] as? String,
-               let newQuestions = dict["new_questions"] as? [String]
-            {
-                for i in newQuestions {
-                    selectedQuestions.append(i)
-                    registeredQuestions.append(i)
-                }
-                usedQuestions.append(question)
-                self.currentQuestion = question
-                startStopClicked()
-            }
-        }
         currentQuestionLabel.text = self.currentQuestion
+        
+        
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -378,7 +427,13 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
             let displayVC = segue.destination as! QuestionPopViewController
             displayVC.selectedQuestions = self.selectedQuestions
             displayVC.firstq = self.receivedFirstQ
-            displayVC.usedquestions = self.usedQuestions
+            
+            var questionused:[String] = []
+            for used in usedQuestions {
+                questionused.append(used.question)
+            }
+            
+            displayVC.usedquestions = questionused
             displayVC.callback = { time in
                 guard let min = time else {return}
                 var minTime = ""
@@ -412,10 +467,10 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
     
     //setting buttons with users
     func setTable(){
-        tableConfig = [1: UIImage(named: "chair1")!, 2: UIImage(named: "chair1")!, 3: UIImage(named: "chair1")!, 4: UIImage(named: "chair1")!,5: UIImage(named: "chair1")!,6: UIImage(named: "chair2")!,7: UIImage(named: "chair2")!,8: UIImage(named: "chair2")!,9: UIImage(named: "chair4")!,10: UIImage(named: "chair4")!, 11: UIImage(named: "chair4")!, 12: UIImage(named: "chair4")!, 13: UIImage(named: "chair4")!, 14: UIImage(named: "chair3")!, 15: UIImage(named: "chair3")!, 16: UIImage(named: "chair3")!]
+        tableConfig = [1: UIImage(named: "chair-green")!, 2: UIImage(named: "chair-green")!, 3: UIImage(named: "chair-green")!, 4: UIImage(named: "chair-green")!,5: UIImage(named: "chair-green")!,6: UIImage(named: "chair-green")!,7: UIImage(named: "chair-green")!,8: UIImage(named: "chair-green")!,9: UIImage(named: "chair-green")!,10: UIImage(named: "chair-green")!, 11: UIImage(named: "chair-green")!, 12: UIImage(named: "chair-green")!, 13: UIImage(named: "chair-green")!, 14: UIImage(named: "chair-green")!, 15: UIImage(named: "chair-green")!, 16: UIImage(named: "chair-green")!]
         var cnt = 0
         for i in tableSetting {
-            tableConfig[i] = UIImage(named: "Boy")
+            tableConfig[i] = UIImage(named: "boy-icon")
             partNames[i-1].text = names[cnt]
             buttonEnabes[i-1] = true
             cnt+=1
@@ -517,7 +572,7 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
         //enable speaking buttons
         if(modeSwitch == true){
             typeSelected = true
-            notification.isHidden = true
+//            notification.isHidden = true
             for (element, _) in tableConfig {
                 self.buttons[element-1].isEnabled = buttonEnabes[element-1]
             }
@@ -618,7 +673,7 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
         
         if(modeSwitch == true){
             if(typeSelected == false){
-                notification.isHidden = false
+//                notification.isHidden = false
                 for (element, _) in tableConfig {
                     self.buttons[element-1].isEnabled = false
                 }
@@ -694,10 +749,10 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
         
         DatabaseManager.shared.recordDiscussionFlow(with: discussionId, selectedPerson: person, startTime: startTime, endTime: endTime, duration: duration, responseType: responseType, responseAList: responseAList, responseBList: responseBList, completion: {success in
             if(success){
-//                print("recorded")
+                print("recorded")
             }
             else{
-//                print("error")
+                print("error recording")
             }
         })
     }
@@ -713,14 +768,14 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
         if(timerCounting){
             timerCounting = false
             timer.invalidate()
-            startStopButton.setBackgroundImage(UIImage(named: "resume"), for: .normal)
+            startStopButton.setBackgroundImage(UIImage(named: "start-1"), for: .normal)
             for button in buttons{
                 button.isEnabled = false
             }
         }
         else{
             timerCounting = true
-            startStopButton.setBackgroundImage(UIImage(named: "pauseBtn"), for: .normal)
+            startStopButton.setBackgroundImage(UIImage(named: "resume-1"), for: .normal)
             timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(timerCounter), userInfo: nil, repeats: true)
             for (element, _) in tableConfig {
                 self.buttons[element-1].isEnabled = buttonEnabes[element-1]
@@ -777,9 +832,11 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
 
     
     func discussionEnded(){
+        usedQuestions.append(questionSet(question: currentQuestion, duration: questionStart-count))
+        
         finishedTime = count
         
-        addRegistered()
+//        addRegistered()
         let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
         let resultVC = storyBoard.instantiateViewController(withIdentifier: "resultView") as! ResultViewController
         

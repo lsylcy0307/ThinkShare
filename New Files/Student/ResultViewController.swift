@@ -24,7 +24,11 @@ class ResultViewController: UIViewController, ChartViewDelegate, UITableViewDele
     var greenView = UIView()
     var purpleView = UIView()
     var pinkView = UIView()
+    var tablesTitleView = UIView()
     var orangeView = UIView()
+    var durationView = UIView()
+    var participantsView = UIView()
+    var linesView = UIView()
     var initialTime = 0
     var finishTime = 0
     var recordingPath: URL?
@@ -33,7 +37,7 @@ class ResultViewController: UIViewController, ChartViewDelegate, UITableViewDele
     var speakFrequency = [Int]()
     var responseTypeCnt = [Int]()
     var discussionId = ""
-    var questions = [String]()
+    var questions = [questionSet]()
     var nonZeroTableName = [String]()
     var nonZeroSpeakTime = [Int]()
     var filename = ""
@@ -43,9 +47,15 @@ class ResultViewController: UIViewController, ChartViewDelegate, UITableViewDele
     let questionTableView = UITableView()
     
     
+    private let scrollView: UIScrollView = {
+        let scrollView = UIScrollView()
+        scrollView.clipsToBounds = true
+        return scrollView
+    }()
+    
     private let backButton: UIButton = {
         let button = UIButton()
-        button.setTitle("End Harkness", for: .normal)
+        button.setTitle("Home", for: .normal)
         button.backgroundColor = UIColor(red: 255/255, green: 153/255, blue: 51/255, alpha: 1)
         button.setTitleColor(.white, for: .normal)
         button.layer.cornerRadius = 12
@@ -68,27 +78,45 @@ class ResultViewController: UIViewController, ChartViewDelegate, UITableViewDele
     lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = "Discussion Analytics "
-        label.font = UIFont(name: "HiraginoSans-W7", size: 40)
-        label.textColor = UIColor(red: 102/255, green: 0, blue: 102/255, alpha: 1)
+        label.text = "Discussion overview"
+        label.font = UIFont(name: "NotoSansKannada-Bold", size: 41)
+        label.textColor = .black
+        return label
+    }()
+    
+    lazy var tableTitleLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.text = "Speaking distributions"
+        label.font = UIFont(name: "NotoSansKannada-regular", size: 28)
+        label.textColor = .black
         return label
     }()
     
     lazy var questionLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = "Questions Selected:"
-        label.font = UIFont(name: "HiraginoSans-W7", size: 20)
-        label.textColor = UIColor(red: 102/255, green: 0, blue: 102/255, alpha: 1)
+        label.text = "Discussed Questions"
+        label.font = UIFont(name: "NotoSansKannada-Bold", size: 16)
+        label.textColor = UIColor(red: 106/255, green: 106/255, blue: 106/255, alpha: 1)
+        return label
+    }()
+    
+    lazy var questionTotalLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.text = "total"
+        label.font = UIFont(name: "NotoSansKannada-Bold", size: 13)
+        label.textColor = UIColor(red: 106/255, green: 106/255, blue: 106/255, alpha: 0.7)
         return label
     }()
     
     lazy var spokenLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = "Time Spoken:"
-        label.font = UIFont(name: "HiraginoSans-W7", size: 20)
-        label.textColor = UIColor(red: 102/255, green: 0, blue: 102/255, alpha: 1)
+        label.text = "Response Types"
+        label.font = UIFont(name: "HiraginoSans-W7", size: 15)
+        label.textColor = UIColor(red: 106/255, green: 106/255, blue: 106/255, alpha: 1)
         return label
     }()
     
@@ -103,8 +131,6 @@ class ResultViewController: UIViewController, ChartViewDelegate, UITableViewDele
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        //loading
-//        getDiscussionFlow()
         
         title = "Discussion Analytics"
         print("filename: \(filename)")
@@ -116,59 +142,101 @@ class ResultViewController: UIViewController, ChartViewDelegate, UITableViewDele
         barChart.delegate = self
         pieChart.delegate = self
         
-        [pieChart, barChart, greenView, purpleView, pinkView, orangeView, backButton, audioButton].forEach{ view.addSubview($0) }
+        durationView.backgroundColor = .systemPink
+        participantsView.backgroundColor = .purple
+        linesView.backgroundColor = .yellow
+//        orangeView.backgroundColor = .orange
+//        greenView.backgroundColor = .green
+        
+        view.addSubview(scrollView)
+        
+        [pinkView, durationView, participantsView, linesView, orangeView, greenView, pieChart, barChart, tablesTitleView].forEach{ scrollView.addSubview($0) }
+         
+//       durationView , linesView, participantsView, pinkView, orangeView
+//         , backButton, audioButton, pieChart, barChart, greenView, purpleView, ]
         
         
-        pinkView.anchor(top: view.safeAreaLayoutGuide.topAnchor, leading: view.safeAreaLayoutGuide.leadingAnchor, bottom: nil, trailing: nil, padding: .init(top: 0, left: 10, bottom: 0, right: 0), size: .init(width: 100, height:50))
+        pinkView.anchor(top: scrollView.safeAreaLayoutGuide.topAnchor, leading: scrollView.safeAreaLayoutGuide.leadingAnchor, bottom: nil, trailing: nil, padding: .init(top: 10, left: 30, bottom: 0, right: 0), size: .init(width: 100, height:60))
         
-        purpleView.anchor(top: pinkView.bottomAnchor, leading: view.safeAreaLayoutGuide.leadingAnchor, bottom: nil, trailing: nil, padding: .init(top: 10, left: 10, bottom: 0, right: 0), size: .init(width: 50, height: 40))
+        tablesTitleView.anchor(top: nil, leading: scrollView.safeAreaLayoutGuide.leadingAnchor, bottom: pieChart.topAnchor, trailing: nil, padding: .init(top: 0, left: 30, bottom: 10, right: 0), size: .init(width: 100, height:40))
         
-        pieChart.anchor(top: purpleView.bottomAnchor, leading: view.safeAreaLayoutGuide.leadingAnchor, bottom: nil, trailing: nil, padding: .init(top: 10, left: 10, bottom: 0, right: 0), size: .init(width: view.width/3, height: 0))
+        durationView.anchor(top: pinkView.bottomAnchor, leading: scrollView.safeAreaLayoutGuide.leadingAnchor, bottom: nil, trailing: nil, padding: .init(top: 10, left: 30, bottom: 0, right: 0), size: .init(width: 140, height:100))
+        
+        participantsView.anchor(top: pinkView.bottomAnchor, leading: scrollView.safeAreaLayoutGuide.leadingAnchor, bottom: nil, trailing: nil, padding: .init(top: 10, left: 190, bottom: 0, right: 0), size: .init(width: 140, height:100))
+        
+        linesView.anchor(top: pinkView.bottomAnchor, leading: scrollView.safeAreaLayoutGuide.leadingAnchor, bottom: nil, trailing: nil, padding: .init(top: 10, left: 350, bottom: 0, right: 0), size: .init(width: 140, height:100))
+        
+        //selected questions
+        orangeView.anchor(top: pinkView.bottomAnchor, leading: nil, bottom: nil, trailing: scrollView.safeAreaLayoutGuide.trailingAnchor, padding: .init(top: 20, left: 0, bottom: 0, right: 100),size: .init(width: 320, height:250))
+
+        //responnse type
+        greenView.anchor(top: orangeView.bottomAnchor, leading: nil, bottom: nil, trailing: scrollView.safeAreaLayoutGuide.trailingAnchor, padding: .init(top: 20, left: 0, bottom: 0, right: 100), size: .init(width: 320, height: 350))
+        
+//        purpleView.anchor(top: pinkView.bottomAnchor, leading: view.safeAreaLayoutGuide.leadingAnchor, bottom: nil, trailing: nil, padding: .init(top: 10, left: 10, bottom: 0, right: 0), size: .init(width: 50, height: 40))
+//
+        //create a view and add in there
+        pieChart.anchor(top: nil, leading: scrollView.safeAreaLayoutGuide.leadingAnchor, bottom: greenView.bottomAnchor, trailing: nil, padding: .init(top: 0, left: 30, bottom: 0, right: 0), size: .init(width: 300, height: 0))
         pieChart.heightAnchor.constraint(equalTo: pieChart.widthAnchor).isActive = true
         
-        barChart.anchor(top: purpleView.bottomAnchor, leading: pieChart.trailingAnchor, bottom: nil, trailing: nil, padding: .init(top: 10, left: 10, bottom: 0, right: 0))
+        pieChart.layer.cornerRadius = 20
+        pieChart.layer.borderColor = .init(red: 106/255, green: 106/255, blue: 106/255, alpha: 0.3)
+        pieChart.layer.borderWidth = 2
+        barChart.layer.cornerRadius = 20
+        barChart.layer.borderColor = .init(red: 106/255, green: 106/255, blue: 106/255, alpha: 0.3)
+        barChart.layer.borderWidth = 2
+//
+        barChart.anchor(top: nil, leading: pieChart.trailingAnchor, bottom: greenView.bottomAnchor, trailing: nil, padding: .init(top: 0, left: 10, bottom: 0, right: 0))
         barChart.heightAnchor.constraint(equalTo: pieChart.widthAnchor).isActive = true
         barChart.widthAnchor.constraint(equalTo: barChart.heightAnchor).isActive = true
+//
         
-        greenView.anchor(top: purpleView.bottomAnchor, leading: barChart.trailingAnchor, bottom: nil, trailing: nil, padding: .init(top: 20, left: 10, bottom: 0, right: 0), size: .init(width: view.width/3, height: view.height*(2/3)))
-        
-        orangeView.anchor(top: pieChart.bottomAnchor, leading: view.safeAreaLayoutGuide.leadingAnchor, bottom: view.safeAreaLayoutGuide.bottomAnchor, trailing: barChart.trailingAnchor, padding: .init(top: 20, left: 10, bottom: 0, right: 0))
 
-        greenView.addSubview(tableView)
+//
+//
+//        greenView.addSubview(tableView)
         greenView.addSubview(spokenLabel)
         pinkView.addSubview(titleLabel)
-        purpleView.addSubview(durationLabel)
+        tablesTitleView.addSubview(tableTitleLabel)
+//        purpleView.addSubview(durationLabel)
         orangeView.addSubview(questionTableView)
         orangeView.addSubview(questionLabel)
+//        orangeView.addSubview(questionTotalLabel)
+        
+        scrollView.isUserInteractionEnabled = true
         
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "resultCell")
         tableView.delegate = self
         tableView.dataSource = self
         
-        questionTableView.register(UITableViewCell.self, forCellReuseIdentifier: "resultCell")
+        questionTableView.register(QuestionTableViewCell.self, forCellReuseIdentifier: QuestionTableViewCell.identifier)
         questionTableView.delegate = self
         questionTableView.dataSource = self
     }
     
     
     override func viewDidLayoutSubviews() {
-        spokenLabel.frame = CGRect(x: 0, y: 0, width: 50, height: 25)
+        
+        scrollView.frame = view.bounds
+        
+        spokenLabel.frame = CGRect(x: 0, y: 0, width: greenView.width, height:20)
         tableView.frame =  CGRect(x: 0,
                                   y: spokenLabel.bottom+2,
                                   width: greenView.width,
                                   height: greenView.height-30)
         
-        questionLabel.frame = CGRect(x: 0, y: 0, width: 100, height: 25)
+        questionLabel.frame = CGRect(x: 0, y: 0, width: orangeView.width - 70, height: 20)
+        //why not stick to the right edge?
+//        questionTotalLabel.frame = CGRect(x: 150, y: 0, width: 60, height: 20)
         questionTableView.frame =  CGRect(x: 0,
                                           y: questionLabel.bottom+2,
                                           width: orangeView.width,
-                                          height: orangeView.height-30)
+                                          height: orangeView.height-22)
         
-        backButton.frame = CGRect(x:view.width-210,
+        backButton.frame = CGRect(x:scrollView.width-210,
                                   y: pinkView.frame.midY,
                                    width: 200,
                                    height: 42)
-        audioButton.frame = CGRect(x:view.width - 300,
+        audioButton.frame = CGRect(x:scrollView.width - 300,
                                    y: pinkView.frame.midY,
                                    width: 64,
                                    height: 64)
@@ -317,6 +385,8 @@ class ResultViewController: UIViewController, ChartViewDelegate, UITableViewDele
         {
             return responseTypeCnt.count
         } else {
+            questionTotalLabel.text = "\(questions.count) total"
+            
             return questions.count
         }
     }
@@ -329,8 +399,8 @@ class ResultViewController: UIViewController, ChartViewDelegate, UITableViewDele
             cell.textLabel?.text = "\(responseTypes[indexPath.row]): \(responseTypeCnt[indexPath.row])"
             return cell
         } else {
-            let cell = tableView.dequeueReusableCell(withIdentifier: "resultCell", for: indexPath)
-            cell.textLabel?.text = "\(questions[indexPath.row])"
+            let cell = tableView.dequeueReusableCell(withIdentifier: QuestionTableViewCell.identifier, for: indexPath) as! QuestionTableViewCell
+            cell.configure(with: .red, question: questions[indexPath.row].question, time: questions[indexPath.row].duration)
             return cell
         }
     }//100*150

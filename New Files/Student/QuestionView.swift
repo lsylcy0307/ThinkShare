@@ -35,17 +35,20 @@ class QuestionView: UIView {
     var QuestionInput:UITextField={
         let textField = UITextField()
         textField.font = UIFont(name: "ArialMT", size: 15)
-        textField.layer.cornerRadius = 5
-        textField.layer.borderWidth = 2
+        textField.layer.cornerRadius = 10
+        textField.backgroundColor = UIColor.white
+//        textField.layer.borderWidth = 2
         return textField
     }()
     
     lazy var btnRemove: UIButton = {
         let btn = UIButton()
         btn.setTitle("Remove", for: .normal)
-        btn.setTitleColor(.red, for: .normal)
-        btn.layer.borderWidth = 0.5
-        btn.layer.borderColor = UIColor.red.cgColor
+        btn.backgroundColor = UIColor(cgColor: CGColor(red: 87/255, green: 149/255, blue: 149/255, alpha: 1))
+        btn.setTitleColor(.white, for: .normal)
+        btn.layer.cornerRadius = 10
+//        btn.layer.borderWidth = 0.5
+//        btn.layer.borderColor = UIColor.red.cgColor
         let constraint = btn.heightAnchor.constraint(equalToConstant: 30)
         constraint.isActive = true
         constraint.priority = UILayoutPriority(rawValue: 999)
@@ -73,7 +76,7 @@ class QuestionView: UIView {
     init(delegate: QuestionViewDelegate) {
         self.delegate = delegate
         super.init(frame: .zero)
-        backgroundColor = .lightGray
+        backgroundColor = UIColor(cgColor: CGColor(red: 255/255, green: 242/255, blue: 198/255, alpha: 1))
         addSubview(stackView)
         stackView.snp.makeConstraints { (make) in
             make.edges.equalToSuperview().inset(UIEdgeInsets(top: 5, left: 10, bottom: 10, right: 10))

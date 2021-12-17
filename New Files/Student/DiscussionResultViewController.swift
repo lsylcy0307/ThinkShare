@@ -24,7 +24,7 @@ struct DiscResult {
     let SpeakTimeDistribution: [Int]
     let finishTime: Int
     let startTime: Int
-    let UsedQuestions: [String]
+    let UsedQuestions: [questionSet]
     let responseTypeCnt: [Int]
 }
 
@@ -40,7 +40,7 @@ class DiscussionResultViewController: UIViewController {
     var finishTime = Int()
     var speakFrequency = [Int]()
     var responseTypeCnt = [Int]()
-    var usedquestions = [String]()
+    var usedquestions = [questionSet]()
     var names = ["","","","","","","","", "","","","", "","","",""]
     var tableNames = [String]()
     
@@ -98,6 +98,11 @@ class DiscussionResultViewController: UIViewController {
     }
     
     func interpretFlow(){
+        print("called setup")
+        print(discussionSetup)
+        print("------")
+        print(discussionResult)
+        
         var cnt = 0
         for i in discussionSetup!.tableSetting {
             names[i-1] = discussionSetup!.names[cnt]

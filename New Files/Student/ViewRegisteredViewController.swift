@@ -43,7 +43,7 @@ class ViewRegisteredViewController: UIViewController {
         super.viewDidLoad()
         
         //temporary, need to be solved - login, user issue
-        title = "Home"
+        title = "Start a new discussion"
         navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "list.dash"), style: .done, target: self, action: #selector(TapMenuButton))
         view.backgroundColor = .white
 //        view.tag = 3

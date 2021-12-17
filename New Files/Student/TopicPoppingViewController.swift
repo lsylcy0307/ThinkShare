@@ -21,6 +21,8 @@ class TopicPoppingViewController: UIViewController {
     @IBOutlet var popView: UIView!
     @IBOutlet weak var backBtn: UIButton!
 
+    @IBOutlet weak var topicView: UIView!
+    
     private var selectedIdx = 0
     private var hasFetchedText = false
     private var textSelected = false
@@ -31,7 +33,7 @@ class TopicPoppingViewController: UIViewController {
         button.isHidden = true
         button.setTitle("Click for the Text", for: .normal)
 //        button.backgroundColor = UIColor(red: 238/255, green: 168/255, blue: 73/255, alpha: 1)
-        button.setBackgroundImage(UIImage(named: "buttonColor2"), for: .normal)
+        button.backgroundColor = UIColor(red: 87/255, green: 149/255, blue: 149/255, alpha: 1)
         button.contentMode = .scaleToFill
         button.setTitleColor(.white, for: .normal)
         button.layer.cornerRadius = 12
@@ -41,10 +43,19 @@ class TopicPoppingViewController: UIViewController {
         return button
     }()
     
+    @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var collectionView: UICollectionView!
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        topicView.layer.cornerRadius = 10
+        topicView.layer.borderWidth = 10
+        topicView.layer.borderColor = CGColor(red: 252/255, green: 197/255, blue: 0/255, alpha: 1)
+        
+        imageView.layer.cornerRadius = imageView.frame.size.width/2
+        imageView.layer.borderWidth = 10
+        imageView.layer.borderColor = CGColor(red: 252/255, green: 197/255, blue: 0/255, alpha: 1)
         
         if !textSelected{
             backBtn.isHidden = true
@@ -151,6 +162,21 @@ extension TopicPoppingViewController: UICollectionViewDelegate, UICollectionView
             textSelected = true
             self.loadLink()
         }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        
+        let noOfCellsInRow = 1
+        
+        let flowLayout = collectionViewLayout as! UICollectionViewFlowLayout
+        
+        let totalSpace = flowLayout.sectionInset.left
+        + flowLayout.sectionInset.right
+        + (flowLayout.minimumInteritemSpacing * CGFloat(noOfCellsInRow - 1))
+        
+        let size = Int((collectionView.bounds.width - totalSpace) / CGFloat(noOfCellsInRow))
+        
+        return CGSize(width: size, height: 50)
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {

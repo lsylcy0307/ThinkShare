@@ -68,12 +68,12 @@ class HistoryViewController: UIViewController {
                     self?.noSettingsLabel.isHidden = false
                     return
                 }
-                print(histories)
+//                print(histories)
                 
                 self?.noSettingsLabel.isHidden = true
                 self?.tableView.isHidden = false
                 self?.discussions = histories
-                print(histories)
+//                print(histories)
                 DispatchQueue.main.async {
                     self?.tableView.reloadData()
                 }
@@ -121,6 +121,7 @@ extension HistoryViewController: UITableViewDelegate, UITableViewDataSource {
         
         let vc = DiscussionResultViewController()
         vc.discussionId = discussionID
+        print("calling: \(discussionID)")
         
         let nav = UINavigationController(rootViewController: vc)
         nav.modalPresentationStyle = .overFullScreen

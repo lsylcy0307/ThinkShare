@@ -13,13 +13,17 @@ class RegisteredSettingsTableViewCell: UITableViewCell {
     
     private let textCodeLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 50, weight: .semibold)
+        label.font = .systemFont(ofSize: 50, weight: .bold)
         return label
     }()
     
     private let teacherLabel: UILabel = {
         let label = UILabel()
+        label.layer.cornerRadius = 10
+        label.textAlignment = .center
+        label.backgroundColor = .white
         label.font = .systemFont(ofSize: 25, weight: .regular)
+        label.textColor = UIColor(cgColor: CGColor(red: 106/255, green: 106/255, blue: 106/255, alpha: 1))
         label.numberOfLines = 0
         return label
     }()
@@ -29,7 +33,7 @@ class RegisteredSettingsTableViewCell: UITableViewCell {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         contentView.addSubview(textCodeLabel)
         contentView.addSubview(teacherLabel)
-        self.backgroundColor = UIColor(red: 138/255, green: 43/255, blue: 226/255, alpha: 0.3)
+        self.backgroundColor = UIColor(red: 255/255, green: 242/255, blue: 198/255, alpha: 1)
     }
     
     required init?(coder: NSCoder) {
@@ -43,10 +47,10 @@ class RegisteredSettingsTableViewCell: UITableViewCell {
                                      y: 10,
                                      width: 300,
                                      height: 60)
-        teacherLabel.frame = CGRect(x: textCodeLabel.right + 20,
-                                     y: 10,
-                                     width: contentView.width - 30 - textCodeLabel.width,
-                                     height: 30)
+        teacherLabel.frame = CGRect(x: contentView.right - 350,
+                                     y: 20,
+                                     width: 300,
+                                     height: 50)
     }
 
     public func configure(with model: registeredSetting) {

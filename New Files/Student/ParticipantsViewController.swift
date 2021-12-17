@@ -71,9 +71,12 @@ class ParticipantsViewController: UIViewController{
         continueBtn.addTarget(self, action: #selector(didTapContinue), for: .touchUpInside)
         backBtn.addTarget(self, action: #selector(backClicked), for: .touchUpInside)
         
-        whiteView.layer.cornerRadius = 12
-        continueBtn.layer.cornerRadius = 12
-        backBtn.layer.cornerRadius = 12
+        collectionView.layer.cornerRadius = 10
+        collectionView.layer.borderWidth = 2
+        collectionView.layer.borderColor = CGColor(red: 142/255, green: 142/255, blue: 142/255, alpha: 0.7)
+        
+//        continueBtn.layer.cornerRadius = 12
+//        backBtn.layer.cornerRadius = 12
         
         continueBtn.isEnabled = false
         count = 0
@@ -81,8 +84,8 @@ class ParticipantsViewController: UIViewController{
         guard let participants = participant else {return}
  
         for i in 1...participants {
-            images.append(UIImage(named: "Boy")!)
-            originalImg.append(UIImage(named: "Boy")!)
+            images.append(UIImage(named: "boy-icon")!)
+            originalImg.append(UIImage(named: "boy-icon")!)
             names.append(partNames[i-1]!)
             userIndex.append(count)
             count+=1

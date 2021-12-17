@@ -537,7 +537,7 @@ extension DatabaseManager{
     }
     
     
-    public func recordDiscussionResult(with discussionId:String, speakFrequency: [Int], speakTime: [Int], usedQuestions:[String], initialTime: Int, finishTime:Int, responseTypeCnt:[Int], completion: @escaping (Bool) -> Void){
+    public func recordDiscussionResult(with discussionId:String, speakFrequency: [Int], speakTime: [Int], usedQuestions:[questionSet], initialTime: Int, finishTime:Int, responseTypeCnt:[Int], completion: @escaping (Bool) -> Void){
         
         let start_Time = timerFormat(seconds: initialTime)
         let startTimeString = makeTimeString(minutes: start_Time.0, seconds: start_Time.1)
@@ -554,6 +554,15 @@ extension DatabaseManager{
                 return
             }
             
+            var usedQuestionData = [[String:Any]]()
+            for question in usedQuestions {
+                let questionData: [String:Any] =
+                ["question":question.question,
+                 "duration":question.duration]
+                usedQuestionData.append(questionData)
+            }
+            print(usedQuestionData)
+            
             let discussionResult: [String: Any] = [
                 "FrequencyDistribution": speakFrequency,
                 "startTime": startTimeString,
@@ -561,7 +570,7 @@ extension DatabaseManager{
                 "startTime_int":initialTime,
                 "endTime_int":finishTime,
                 "SpeakTimeDistribution": speakTime,
-                "UsedQuestions": usedQuestions,
+                "UsedQuestions": usedQuestionData,
                 "responseTypeCnt": responseTypeCnt
             ]
             
@@ -620,6 +629,8 @@ extension DatabaseManager{
                 "react_pressed_x":responseAList,
                 "react_thumbs_ups":responseBList
             ]
+            
+            print(newFlowEntry)
             
             if var discussionFlows = userNode["discussionFlow"] as? [[String:Any]]{
                 
@@ -720,7 +731,7 @@ extension DatabaseManager{
             
             guard let fdist = value["FrequencyDistribution"] as? [Int],
                   let sdist = value["SpeakTimeDistribution"] as? [Int],
-                  let questions = value["UsedQuestions"] as? [String],
+                  let questions = value["UsedQuestions"] as? [[String:Any]],
                   let finishTime = value["endTime_int"] as? Int,
                   let startTime = value["startTime_int"] as? Int,
                   let responseTypeCnt = value["responseTypeCnt"] as? [Int]
@@ -728,7 +739,12 @@ extension DatabaseManager{
                 return
             }
             
-            let result = DiscResult(FrequencyDistribution: fdist, SpeakTimeDistribution: sdist, finishTime: finishTime, startTime: startTime, UsedQuestions: questions, responseTypeCnt: responseTypeCnt)
+            var questionData = [questionSet]()
+            for i in questions {
+                questionData.append(questionSet(question: i["question"] as! String, duration: i["duration"] as! Int))
+            }
+            
+            let result = DiscResult(FrequencyDistribution: fdist, SpeakTimeDistribution: sdist, finishTime: finishTime, startTime: startTime, UsedQuestions: questionData, responseTypeCnt: responseTypeCnt)
             
             completion(.success(result))
         })

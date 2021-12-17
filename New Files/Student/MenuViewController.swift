@@ -51,7 +51,7 @@ class MenuViewController: UIViewController, UITableViewDelegate, UITableViewData
         view.addSubview(tableView)
         tableView.delegate = self
         tableView.dataSource = self
-        tableView.backgroundColor = UIColor(red: 75/255, green: 0/255, blue: 130/255, alpha: 0.2)
+        tableView.backgroundColor = .white
     }
     
     override func viewDidLayoutSubviews() {
@@ -70,7 +70,7 @@ class MenuViewController: UIViewController, UITableViewDelegate, UITableViewData
         cell.textLabel?.textColor = .white
         cell.imageView?.image = UIImage(systemName: MenuOptions.allCases[indexPath.row].imageName)
         cell.imageView?.tintColor = .white
-        cell.contentView.backgroundColor = UIColor(red: 75/255, green: 0/255, blue: 130/255, alpha: 1)
+        cell.contentView.backgroundColor = UIColor(red: 87/255, green: 149/255, blue: 149/255, alpha: 1)
         return cell
     }
     
