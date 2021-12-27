@@ -98,8 +98,8 @@ extension TeacherContainerViewController: TeacherMenuViewControllerDelegate {
             self.addProfile()
         case .info:
             break
-        case .register:
-            self.addRegister()
+//        case .register:
+//            self.addRegister()
         }
     }
     

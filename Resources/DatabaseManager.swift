@@ -517,6 +517,9 @@ extension DatabaseManager{
                           print("nil")
                           return nil
                       }
+                let dateArr = date.components(separatedBy: " ")
+                let dateString = dateArr[0] + " " + dateArr[1] + " " + dateArr[2]
+                
                 var settings = [discussionSetting]()
                 for text in texts {
                     guard let questions = text["questions"] as? [String],
@@ -529,7 +532,7 @@ extension DatabaseManager{
                 print("ready to send")
                 print(settings)
                 
-                return Setting(code: code, textSettings: settings, registeredDate: date)
+                return Setting(code: code, textSettings: settings, registeredDate: dateString)
             })
             
             completion(.success(settings))
@@ -537,7 +540,7 @@ extension DatabaseManager{
     }
     
     
-    public func recordDiscussionResult(with discussionId:String, speakFrequency: [Int], speakTime: [Int], usedQuestions:[questionSet], initialTime: Int, finishTime:Int, responseTypeCnt:[Int], completion: @escaping (Bool) -> Void){
+    public func recordDiscussionResult(with discussionId:String, speakFrequency: [Int], speakTime: [Int], usedQuestions:[questionSet], initialTime: Int, finishTime:Int, responseTypeCnt:[Int], lineCnt:Int, completion: @escaping (Bool) -> Void){
         
         let start_Time = timerFormat(seconds: initialTime)
         let startTimeString = makeTimeString(minutes: start_Time.0, seconds: start_Time.1)
@@ -571,7 +574,8 @@ extension DatabaseManager{
                 "endTime_int":finishTime,
                 "SpeakTimeDistribution": speakTime,
                 "UsedQuestions": usedQuestionData,
-                "responseTypeCnt": responseTypeCnt
+                "responseTypeCnt": responseTypeCnt,
+                "lineCnt": lineCnt
             ]
             
             if var result = userNode["discussionResult"] as? [[String:Any]]{
@@ -734,6 +738,7 @@ extension DatabaseManager{
                   let questions = value["UsedQuestions"] as? [[String:Any]],
                   let finishTime = value["endTime_int"] as? Int,
                   let startTime = value["startTime_int"] as? Int,
+                  let lineCnt = value["lineCnt"] as? Int,
                   let responseTypeCnt = value["responseTypeCnt"] as? [Int]
             else {
                 return
@@ -744,7 +749,7 @@ extension DatabaseManager{
                 questionData.append(questionSet(question: i["question"] as! String, duration: i["duration"] as! Int))
             }
             
-            let result = DiscResult(FrequencyDistribution: fdist, SpeakTimeDistribution: sdist, finishTime: finishTime, startTime: startTime, UsedQuestions: questionData, responseTypeCnt: responseTypeCnt)
+            let result = DiscResult(FrequencyDistribution: fdist, SpeakTimeDistribution: sdist, finishTime: finishTime, startTime: startTime, UsedQuestions: questionData, responseTypeCnt: responseTypeCnt, lineCnt: lineCnt)
             
             completion(.success(result))
         })

@@ -68,7 +68,7 @@ class ProfileViewController: UIViewController {
                                               width: self.view.width,
                                               height: 300))
         
-        headerView.backgroundColor = .systemPurple
+        headerView.backgroundColor = UIColor(red: 255/255, green: 233/255, blue: 157/255, alpha: 1)
         
         let imageView = UIImageView(frame: CGRect(x: (headerView.width-150) / 2,
                                                   y: 75,

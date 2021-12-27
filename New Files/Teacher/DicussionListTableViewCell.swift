@@ -13,12 +13,16 @@ class DicussionListTableViewCell: UITableViewCell {
     
     private let textCodeLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 50, weight: .semibold)
+        label.font = .systemFont(ofSize: 50, weight: .bold)
         return label
     }()
     
     private let dateLabel: UILabel = {
         let label = UILabel()
+        label.layer.cornerRadius = 10
+        label.textAlignment = .center
+        label.backgroundColor = .white
+        label.textColor = UIColor(cgColor: CGColor(red: 106/255, green: 106/255, blue: 106/255, alpha: 1))
         label.font = .systemFont(ofSize: 25, weight: .regular)
         label.numberOfLines = 0
         return label
@@ -42,10 +46,10 @@ class DicussionListTableViewCell: UITableViewCell {
                                      y: 10,
                                      width: 300,
                                      height: 60)
-        dateLabel.frame = CGRect(x: textCodeLabel.right + 20,
-                                     y: 10,
-                                     width: contentView.width - 30 - textCodeLabel.width,
-                                     height: 30)
+        dateLabel.frame = CGRect(x: contentView.right - 350,
+                                 y: 20,
+                                 width: 300,
+                                 height: 50)
     }
 
     public func configure(with model: Setting) {

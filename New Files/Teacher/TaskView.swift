@@ -17,7 +17,6 @@ class TaskView: UIView, InputViewDelegate {
         }
     }
     
-//    let data: [String: Any]
     
     lazy var stackView: UIStackView = {
         let stackView = UIStackView()
@@ -53,7 +52,7 @@ class TaskView: UIView, InputViewDelegate {
     
     var textNamelabel:UILabel={
         let label = UILabel()
-        label.text = "Text Name"
+        label.text = "Text name"
         label.font = UIFont(name: "ArialMT", size: 15)
         return label
     }()
@@ -61,14 +60,14 @@ class TaskView: UIView, InputViewDelegate {
     var textNameInput:UITextField={
         let textField = UITextField()
         textField.font = UIFont(name: "ArialMT", size: 15)
-        textField.layer.cornerRadius = 5
-        textField.layer.borderWidth = 2
+        textField.layer.cornerRadius = 10
+        textField.backgroundColor = UIColor.white
         return textField
     }()
     
     var textLinklabel:UILabel={
         let label = UILabel()
-        label.text = "Text Link"
+        label.text = "Text link"
         label.font = UIFont(name: "ArialMT", size: 15)
         return label
     }()
@@ -76,17 +75,18 @@ class TaskView: UIView, InputViewDelegate {
     var textLinkInput:UITextField={
         let textField = UITextField()
         textField.font = UIFont(name: "ArialMT", size: 15)
-        textField.layer.cornerRadius = 5
-        textField.layer.borderWidth = 1
+        textField.layer.cornerRadius = 10
+        textField.backgroundColor = UIColor.white
         return textField
     }()
     
     lazy var btnRemove: UIButton = {
         let btn = UIButton()
         btn.setTitle("Remove", for: .normal)
-        btn.setTitleColor(.red, for: .normal)
-        btn.layer.borderWidth = 0.5
-        btn.layer.borderColor = UIColor.red.cgColor
+        btn.backgroundColor = UIColor(cgColor: CGColor(red: 87/255, green: 149/255, blue: 149/255, alpha: 1))
+        btn.setTitleColor(.white, for: .normal)
+        btn.layer.cornerRadius = 10
+        
         let constraint = btn.heightAnchor.constraint(equalToConstant: 30)
         constraint.isActive = true
         constraint.priority = UILayoutPriority(rawValue: 999)
@@ -138,7 +138,7 @@ class TaskView: UIView, InputViewDelegate {
     lazy var addButton: UIButton  = {
         let button = UIButton()
         button.setTitle("+", for: .normal)
-        button.setTitleColor(.blue, for: .normal)
+        button.setTitleColor(UIColor(cgColor: CGColor(red: 87/255, green: 149/255, blue: 149/255, alpha: 1)), for: .normal)
         button.addTarget(self, action: #selector(addMoreTextField), for: .touchUpInside)
         return button
     }()
@@ -146,7 +146,10 @@ class TaskView: UIView, InputViewDelegate {
     lazy var btnShow: UIButton = {
         let btn = UIButton()
         btn.setTitle("Hide", for: .normal)
-        btn.setTitleColor(.blue, for: .normal)
+        btn.backgroundColor = .white
+        btn.setTitleColor(UIColor(cgColor: CGColor(red: 87/255, green: 149/255, blue: 149/255, alpha: 1)), for: .normal)
+        btn.layer.cornerRadius = 10
+        
         btn.addTarget(self, action: #selector(btnShowTouchUpInside), for: .touchUpInside)
         return btn
     }()
@@ -157,7 +160,7 @@ class TaskView: UIView, InputViewDelegate {
 //        self.data = data
         self.delegate = delegate
         super.init(frame: .zero)
-        backgroundColor = .lightGray
+        backgroundColor = UIColor(cgColor: CGColor(red: 255/255, green: 242/255, blue: 198/255, alpha: 1))
         addSubview(stackView)
         stackView.snp.makeConstraints { (make) in
             make.edges.equalToSuperview().inset(UIEdgeInsets(top: 5, left: 10, bottom: 10, right: 10))

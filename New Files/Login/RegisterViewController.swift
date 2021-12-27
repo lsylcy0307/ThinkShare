@@ -29,6 +29,24 @@ final class RegisterViewController: UIViewController {
         imageView.layer.borderColor = UIColor.lightGray.cgColor
         return imageView
     }()
+    
+    lazy var registerLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.text = "Welcome to ThinkShare"
+        label.font = UIFont(name: "NotoSansKannada-Bold", size: 55)
+        label.textColor = .black
+        return label
+    }()
+    
+    lazy var infoLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.text = "Opening up for a discussion."
+        label.font = UIFont(name: "NotoSansKannada-Bold", size: 20)
+        label.textColor = .gray
+        return label
+    }()
 
     private let firstNameField: UITextField = {
         let field = UITextField()
@@ -41,7 +59,7 @@ final class RegisterViewController: UIViewController {
         field.placeholder = "First Name..."
         field.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 5, height: 0))
         field.leftViewMode = .always
-        field.backgroundColor = .secondarySystemBackground
+        field.backgroundColor = .white
         return field
     }()
 
@@ -56,7 +74,7 @@ final class RegisterViewController: UIViewController {
         field.placeholder = "Last Name..."
         field.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 5, height: 0))
         field.leftViewMode = .always
-        field.backgroundColor = .secondarySystemBackground
+        field.backgroundColor = .white
         return field
     }()
 
@@ -71,7 +89,7 @@ final class RegisterViewController: UIViewController {
         field.placeholder = "Email Address..."
         field.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 5, height: 0))
         field.leftViewMode = .always
-        field.backgroundColor = .secondarySystemBackground
+        field.backgroundColor = .white
         return field
     }()
     
@@ -81,7 +99,7 @@ final class RegisterViewController: UIViewController {
         field.layer.borderWidth = 1
         field.layer.borderColor = UIColor.lightGray.cgColor
         field.text = "Are you a..."
-        field.backgroundColor = .secondarySystemBackground
+        field.backgroundColor = .white
         return field
     }()
 
@@ -96,17 +114,17 @@ final class RegisterViewController: UIViewController {
         field.placeholder = "Password..."
         field.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 5, height: 0))
         field.leftViewMode = .always
-        field.backgroundColor = .secondarySystemBackground
+        field.backgroundColor = .white
         field.isSecureTextEntry = true
         return field
     }()
 
     private let registerButton: UIButton = {
         let button = UIButton()
-        button.setTitle("Register", for: .normal)
-        button.backgroundColor = .systemTeal
+        button.setTitle("CREATE →", for: .normal)
+        button.backgroundColor = UIColor(cgColor: CGColor(red: 252/255, green: 197/255, blue: 0/255, alpha: 1))
         button.setTitleColor(.white, for: .normal)
-        button.layer.cornerRadius = 12
+        button.layer.cornerRadius = 20
         button.layer.masksToBounds = true
         button.titleLabel?.font = .systemFont(ofSize: 20, weight: .bold)
         return button
@@ -117,21 +135,23 @@ final class RegisterViewController: UIViewController {
         title = "Register"
         view.backgroundColor = .systemBackground
 
-        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Register",
-                                                            style: .done,
-                                                            target: self,
-                                                            action: #selector(didTapRegister))
+//        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Register",
+//                                                            style: .done,
+//                                                            target: self,
+//                                                            action: #selector(didTapRegister))
 
-        registerButton.addTarget(self,
-                              action: #selector(registerButtonTapped),
-                              for: .touchUpInside)
+//        registerButton.addTarget(self,
+//                              action: #selector(registerButtonTapped),
+//                              for: .touchUpInside)
 
         emailField.delegate = self
         passwordField.delegate = self
 
         // Add subviews
         view.addSubview(scrollView)
-        scrollView.addSubview(imageView)
+//        scrollView.addSubview(imageView)
+        scrollView.addSubview(registerLabel)
+        scrollView.addSubview(infoLabel)
         scrollView.addSubview(identityField)
         scrollView.addSubview(firstNameField)
         scrollView.addSubview(lastNameField)
@@ -167,39 +187,36 @@ final class RegisterViewController: UIViewController {
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         scrollView.frame = view.bounds
+        
+        registerLabel.frame = CGRect(x: (view.frame.size.width-250)/4, y: view.frame.size.height/6, width: 650, height: 80)
+        
+        infoLabel.frame = CGRect(x:  (view.frame.size.width-250)/4, y: registerLabel.bottom+10, width: 500, height: 30)
 
-        let size = scrollView.width/3
-        imageView.frame = CGRect(x: (scrollView.width-size)/2,
-                                 y: 20,
-                                 width: size,
-                                 height: size)
-
-        imageView.layer.cornerRadius = imageView.width/2.0
-
-        firstNameField.frame = CGRect(x: 30,
-                                  y: imageView.bottom+10,
-                                  width: scrollView.width-60,
+        firstNameField.frame = CGRect(x:  (view.frame.size.width-250)/4,
+                                  y: infoLabel.bottom+15,
+                                  width: registerLabel.width,
                                   height: 52)
-        lastNameField.frame = CGRect(x: 30,
+        lastNameField.frame = CGRect(x:  (view.frame.size.width-250)/4,
                                   y: firstNameField.bottom+10,
-                                  width: scrollView.width-60,
+                                  width: registerLabel.width,
                                   height: 52)
-        emailField.frame = CGRect(x: 30,
+        emailField.frame = CGRect(x:  (view.frame.size.width-250)/4,
                                   y: lastNameField.bottom+10,
-                                  width: scrollView.width-60,
+                                  width: registerLabel.width,
                                   height: 52)
-        passwordField.frame = CGRect(x: 30,
+        passwordField.frame = CGRect(x:  (view.frame.size.width-250)/4,
                                      y: emailField.bottom+10,
-                                     width: scrollView.width-60,
+                                     width: registerLabel.width,
                                      height: 52)
-        identityField.frame = CGRect(x: 30,
+        identityField.frame = CGRect(x:  (view.frame.size.width-250)/4,
                                      y: passwordField.bottom+10,
-                                     width: scrollView.width-60,
+                                     width: registerLabel.width,
                                      height: 52)
-        registerButton.frame = CGRect(x: 30,
+        registerButton.frame = CGRect(x: identityField.right - 180,
                                    y: identityField.bottom+10,
-                                   width: scrollView.width-60,
+                                   width: 180,
                                    height: 52)
+        
 
     }
 

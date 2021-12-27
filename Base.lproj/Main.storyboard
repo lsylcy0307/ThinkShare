@@ -864,22 +864,6 @@
             </objects>
             <point key="canvasLocation" x="3554.8828124999995" y="233.59375"/>
         </scene>
-        <!--Result View Controller-->
-        <scene sceneID="3Xn-Yu-dgj">
-            <objects>
-                <viewController storyboardIdentifier="resultView" id="M2V-qI-5UU" customClass="ResultViewController" customModule="ThinkShare" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="2I0-F7-on0">
-                        <rect key="frame" x="0.0" y="0.0" width="1024" height="768"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <viewLayoutGuide key="safeArea" id="J77-99-7Lq"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                    </view>
-                    <navigationItem key="navigationItem" id="Sut-BB-1wi"/>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="HKr-8R-cCd" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="3463.4765625" y="1105.46875"/>
-        </scene>
         <!--Discussion View Controller-->
         <scene sceneID="IA9-ox-lqd">
             <objects>
@@ -1345,7 +1329,7 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <button opaque="NO" tag="2" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RIO-4S-RoL">
+                            <button opaque="NO" tag="1" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RIO-4S-RoL">
                                 <rect key="frame" x="13" y="264.5" width="147" height="141"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
@@ -1518,7 +1502,6 @@
                         <outlet property="startStopButton" destination="FmG-BJ-7kO" id="oGs-ke-16M"/>
                         <outlet property="table" destination="kew-c2-zkD" id="v9K-Dw-z52"/>
                         <outlet property="timeLabel" destination="1FU-p9-oJH" id="nEI-2E-Wyk"/>
-                        <segue destination="M2V-qI-5UU" kind="presentation" identifier="resultVC" modalPresentationStyle="fullScreen" id="mgY-dZ-tcD"/>
                         <segue destination="YHe-Hw-gJe" kind="presentation" identifier="topicPopoverSeg" modalPresentationStyle="overFullScreen" id="iOj-nz-ALL"/>
                     </connections>
                 </viewController>

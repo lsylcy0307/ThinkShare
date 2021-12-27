@@ -72,7 +72,7 @@ class CreateDiscussionViewController: UIViewController, TaskViewDelegate {
     }
     
     private func addRightBarButton() {
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Finished", style: .done, target: self, action: #selector(nextButtonTapped))
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Create", style: .done, target: self, action: #selector(nextButtonTapped))
     }
     
     @objc

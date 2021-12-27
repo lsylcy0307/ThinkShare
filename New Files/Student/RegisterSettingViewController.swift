@@ -46,8 +46,8 @@ class RegisterSettingViewController: UIViewController {
     private let registerButton: UIButton = {
         let button = UIButton()
         button.setTitle("Register", for: .normal)
-        button.backgroundColor = UIColor(red: 138/255, green: 43/255, blue: 226/255, alpha: 1)
-        button.setTitleColor(.white, for: .normal)
+        button.backgroundColor = UIColor(red: 255/255, green: 233/255, blue: 156/255, alpha: 1)
+        button.setTitleColor(.black, for: .normal)
         button.layer.cornerRadius = 12
         button.layer.masksToBounds = true
         button.titleLabel?.font = .systemFont(ofSize: 20, weight: .bold)

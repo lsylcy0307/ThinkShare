@@ -17,7 +17,7 @@ class TeacherMenusViewController:  UIViewController, UITableViewDelegate, UITabl
     
     enum MenuOptions: String, CaseIterable {
         case home = "Home"
-        case register = "Create"
+//        case register = "Create"
         case profile = "Profile"
         case info = "Information"
         
@@ -29,8 +29,8 @@ class TeacherMenusViewController:  UIViewController, UITableViewDelegate, UITabl
                 return "person"
             case .info:
                 return "gear"
-            case .register:
-                return "airplane"
+//            case .register:
+//                return "airplane"
             }
         }
     }
@@ -48,7 +48,7 @@ class TeacherMenusViewController:  UIViewController, UITableViewDelegate, UITabl
         view.addSubview(tableView)
         tableView.delegate = self
         tableView.dataSource = self
-        tableView.backgroundColor = UIColor(red: 75/255, green: 0/255, blue: 130/255, alpha: 0.2)
+        tableView.backgroundColor = .white
     }
     
     override func viewDidLayoutSubviews() {
@@ -67,7 +67,7 @@ class TeacherMenusViewController:  UIViewController, UITableViewDelegate, UITabl
         cell.textLabel?.textColor = .white
         cell.imageView?.image = UIImage(systemName: MenuOptions.allCases[indexPath.row].imageName)
         cell.imageView?.tintColor = .white
-        cell.contentView.backgroundColor = UIColor(red: 75/255, green: 0/255, blue: 130/255, alpha: 1)
+        cell.contentView.backgroundColor = UIColor(red: 252/255, green: 197/255, blue: 0/255, alpha: 1)
         return cell
     }
     

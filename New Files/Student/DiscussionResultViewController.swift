@@ -8,25 +8,7 @@
 import UIKit
 import Foundation
 
-struct Setup {
-    let date: String
-    let groupName: String
-    let id: String
-    let settingCode: String
-    let teacherName: String
-    let names: [String]
-    let numParticipants: Int
-    let tableSetting: [Int]
-}
 
-struct DiscResult {
-    let FrequencyDistribution: [Int]
-    let SpeakTimeDistribution: [Int]
-    let finishTime: Int
-    let startTime: Int
-    let UsedQuestions: [questionSet]
-    let responseTypeCnt: [Int]
-}
 
 
 class DiscussionResultViewController: UIViewController {
@@ -98,10 +80,6 @@ class DiscussionResultViewController: UIViewController {
     }
     
     func interpretFlow(){
-        print("called setup")
-        print(discussionSetup)
-        print("------")
-        print(discussionResult)
         
         var cnt = 0
         for i in discussionSetup!.tableSetting {
@@ -127,8 +105,14 @@ class DiscussionResultViewController: UIViewController {
         resultVC.finishTime = finishTime
         resultVC.responseTypeCnt = responseTypeCnt
         
-        resultVC.modalPresentationStyle = .overFullScreen
-        self.present(resultVC, animated: true, completion: nil)
+        
+        let navVC = UINavigationController(rootViewController: resultVC)
+        navVC.modalPresentationStyle = .overFullScreen
+        self.present(navVC, animated: true)
+        self.dismiss(animated: true, completion: nil)
+        
+//        resultVC.modalPresentationStyle = .overFullScreen
+//        self.present(resultVC, animated: true, completion: nil)
     }
 
 }

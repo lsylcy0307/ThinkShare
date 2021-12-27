@@ -37,7 +37,6 @@ class QuestionView: UIView {
         textField.font = UIFont(name: "ArialMT", size: 15)
         textField.layer.cornerRadius = 10
         textField.backgroundColor = UIColor.white
-//        textField.layer.borderWidth = 2
         return textField
     }()
     
@@ -47,8 +46,6 @@ class QuestionView: UIView {
         btn.backgroundColor = UIColor(cgColor: CGColor(red: 87/255, green: 149/255, blue: 149/255, alpha: 1))
         btn.setTitleColor(.white, for: .normal)
         btn.layer.cornerRadius = 10
-//        btn.layer.borderWidth = 0.5
-//        btn.layer.borderColor = UIColor.red.cgColor
         let constraint = btn.heightAnchor.constraint(equalToConstant: 30)
         constraint.isActive = true
         constraint.priority = UILayoutPriority(rawValue: 999)

@@ -20,6 +20,43 @@ class LoginViewController: UIViewController {
         return scrollView
     }()
     
+    lazy var loginLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.text = "Login"
+        label.font = UIFont(name: "NotoSansKannada-Bold", size: 55)
+        label.textColor = .black
+        return label
+    }()
+    
+    lazy var infoLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.text = "Please login to continue."
+        label.font = UIFont(name: "NotoSansKannada-Bold", size: 20)
+        label.textColor = .gray
+        return label
+    }()
+    
+    lazy var registerLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.text = "Don't have an account?"
+        label.font = UIFont(name: "NotoSansKannada", size: 20)
+        label.textColor = .gray
+        return label
+    }()
+
+    private let registerButton: UIButton = {
+        let button = UIButton()
+        button.setTitle("Sign up", for: .normal)
+        button.backgroundColor = .white
+        button.setTitleColor(UIColor(red: 252/255, green: 197/255, blue: 0/255, alpha: 1), for: .normal)
+        button.layer.masksToBounds = true
+        button.titleLabel?.font = UIFont(name: "NotoSansKannada-Bold", size: 20)
+        return button
+    }()
+    
     private let imageView:UIImageView = {
         let imageView = UIImageView()
         imageView.image = UIImage(named: "thinkshare-logo")
@@ -69,10 +106,10 @@ class LoginViewController: UIViewController {
     
     private let loginButton: UIButton = {
         let button = UIButton()
-        button.setTitle("Log In", for: .normal)
-        button.backgroundColor = .systemPurple
+        button.setTitle("LOGIN →", for: .normal)
+        button.backgroundColor = UIColor(cgColor: CGColor(red: 87/255, green: 149/255, blue: 149/255, alpha: 1))
         button.setTitleColor(.white, for: .normal)
-        button.layer.cornerRadius = 12
+        button.layer.cornerRadius = 20
         button.layer.masksToBounds = true
         button.titleLabel?.font = .systemFont(ofSize: 20, weight: .bold)
         return button
@@ -86,12 +123,8 @@ class LoginViewController: UIViewController {
         
         //leverage notification  - way app delegate can fire notification and anything that listens it can take action
         //.didLogInNotification -> extension. swift (handling string more carefully)
-        loginObserver = NotificationCenter.default.addObserver(forName: .didLogInNotification ,object: nil, queue: .main, using: {[weak self]_ in
+        loginObserver = NotificationCenter.default.addObserver(forName: .didLogInNotification ,object: nil, queue: .main, using: {_ in
             
-            guard let strongSelf = self else{
-                return
-            }
-//            strongSelf.navigationController?.dismiss(animated: true, completion: nil)
             
             guard let identity = UserDefaults.standard.value(forKey: "identity") as? String else {
                 return
@@ -123,11 +156,14 @@ class LoginViewController: UIViewController {
         title = "log in"
         view.backgroundColor = .white
         
-        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Register", style: .done, target: self, action: #selector(didTapRegister))
+//        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Register", style: .done, target: self, action: #selector(didTapRegister))
         
         //add target to a button
         loginButton.addTarget(self,
                               action: #selector(loginButtonTapped),
+                              for: .touchUpInside)
+        registerButton.addTarget(self,
+                              action: #selector(didTapRegister),
                               for: .touchUpInside)
         
         emailField.delegate = self
@@ -135,10 +171,13 @@ class LoginViewController: UIViewController {
         
         
         view.addSubview(scrollView)
-        scrollView.addSubview(imageView)
+        scrollView.addSubview(loginLabel)
+        scrollView.addSubview(infoLabel)
         scrollView.addSubview(emailField)
         scrollView.addSubview(passwordField)
         scrollView.addSubview(loginButton)
+        scrollView.addSubview(registerLabel)
+        scrollView.addSubview(registerButton)
     }
     //dimiss observer
     deinit {
@@ -150,23 +189,33 @@ class LoginViewController: UIViewController {
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         scrollView.frame = view.bounds
-        let size = scrollView.width/4
-        imageView.frame = CGRect(x: (view.frame.size.width-size)/2,
-                                 y: scrollView.height/4,
-                                 width: size,
-                                 height: size)
-        emailField.frame = CGRect(x: 30,
-                                  y: imageView.bottom+30,
-                                  width: scrollView.width-60,
+//        let size = scrollView.width/4
+//        imageView.frame = CGRect(x: (view.frame.size.width-size)/2,
+//                                 y: scrollView.height/4,
+//                                 width: size,
+//                                 height: size)
+        loginLabel.frame = CGRect(x: view.frame.size.width/4, y: view.frame.size.height/4, width: 300, height: 80)
+        infoLabel.frame = CGRect(x: view.frame.size.width/4, y: loginLabel.bottom+10, width: 300, height: 30)
+        emailField.frame = CGRect(x: view.frame.size.width/4,
+                                  y: infoLabel.bottom+30,
+                                  width: scrollView.width/2,
                                   height: 52)
-        passwordField.frame = CGRect(x: 30,
+        passwordField.frame = CGRect(x: view.frame.size.width/4,
                                      y: emailField.bottom+10,
-                                     width: scrollView.width-60,
+                                     width: scrollView.width/2,
                                      height: 52)
-        loginButton.frame = CGRect(x: 30,
+        loginButton.frame = CGRect(x: passwordField.right - 180,
                                    y: passwordField.bottom+10,
-                                   width: scrollView.width-60,
+                                   width: 180,
                                    height: 52)
+        registerLabel.frame = CGRect(x: (view.frame.size.width-313)/2,
+                                   y: loginButton.bottom+100,
+                                   width: 180,
+                                   height: 30)
+        registerButton.frame = CGRect(x: registerLabel.right + 1,
+                                   y: loginButton.bottom+102,
+                                   width: 110,
+                                   height: 30)
         
     }
     

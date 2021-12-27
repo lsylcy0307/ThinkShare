@@ -28,7 +28,9 @@ class InputView: UIView {
         btn.setTitle("-", for: .normal)
         btn.setTitleColor(.red, for: .normal)
         btn.layer.borderWidth = 0.5
-        btn.layer.borderColor = UIColor.red.cgColor
+        btn.backgroundColor = UIColor(cgColor: CGColor(red: 0, green: 0, blue: 0, alpha: 0))
+        btn.layer.borderColor = CGColor(red: 1, green: 0, blue: 0, alpha: 1)
+        btn.layer.cornerRadius = 10
         let constraint = btn.heightAnchor.constraint(equalToConstant: 30)
         constraint.isActive = true
         constraint.priority = UILayoutPriority(rawValue: 999)
@@ -39,14 +41,15 @@ class InputView: UIView {
     lazy var lblTitle: UILabel = {
         let lbl = UILabel()
         lbl.text = "Question"
+        lbl.font = UIFont(name: "ArialMT", size: 15)
         return lbl
     }()
     
     var textInput: UITextField={
         let textField = UITextField()
         textField.font = UIFont(name: "ArialMT", size: 15)
-        textField.layer.cornerRadius = 5
-        textField.layer.borderWidth = 1
+        textField.layer.cornerRadius = 10
+        textField.backgroundColor = UIColor.white
         return textField
     }()
     
@@ -60,7 +63,8 @@ class InputView: UIView {
     init(delegate: InputViewDelegate) {
         self.delegate = delegate
         super.init(frame: .zero)
-        backgroundColor = .lightGray
+        backgroundColor = UIColor(cgColor: CGColor(red: 252/255, green: 197/255, blue: 0/255, alpha: 1))
+        self.layer.cornerRadius = 10
         addSubview(horizontalStackView)
         horizontalStackView.snp.makeConstraints { (make) in
             make.edges.equalToSuperview().inset(UIEdgeInsets(top: 5, left: 10, bottom: 10, right: 10))

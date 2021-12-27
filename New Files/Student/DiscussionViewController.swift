@@ -25,6 +25,8 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
     private var registeredQuestions = [String]()
     public var modeSwitch = false
     
+    var lineCnt = 0
+    
     var unclickedSame = false
     var typeSelected = false
     var selectionType = 0
@@ -640,6 +642,7 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
             }
         }
         else if !(prevBtn==selectedBtn){
+            lineCnt += 1
             selectionType = 1
             if (sameBtn == true){
                 btnQueue.append(selectedBtn)
@@ -720,10 +723,10 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
         }
         else if modeSwitch == true{
             if(type == 1){
-                line.strokeColor = UIColor(red: 0/255, green: 0/255, blue: 255/255, alpha: 0.3).cgColor
+                line.strokeColor = UIColor(red: 50/255, green: 205/255, blue: 50/255, alpha: 0.3).cgColor
             }
             else if(type == 2){
-                line.strokeColor = UIColor(red: 50/255, green: 205/255, blue: 50/255, alpha: 0.3).cgColor
+                line.strokeColor = UIColor(red: 0/255, green: 0/255, blue: 255/255, alpha: 0.3).cgColor
             }
             else if(type == 3){
                 line.strokeColor = UIColor(red: 255/255, green: 165/255, blue: 0/255, alpha: 0.3).cgColor
@@ -837,8 +840,10 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
         finishedTime = count
         
 //        addRegistered()
-        let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
-        let resultVC = storyBoard.instantiateViewController(withIdentifier: "resultView") as! ResultViewController
+//        let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
+//        let resultVC = storyBoard.instantiateViewController(withIdentifier: "resultView") as! ResultViewController
+        
+        let resultVC = ResultViewController()
         
         resultVC.tableName = self.tableNames
         resultVC.speakFrequency = self.frequencySpeak
@@ -848,6 +853,8 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
         resultVC.initialTime = self.initialTime
         resultVC.finishTime = self.finishedTime
         resultVC.responseTypeCnt = self.responseTypeCnt
+        resultVC.numParticipants = self.numParticipants
+        resultVC.lineCnt = self.lineCnt
         
         if isRecording {
             soundRecorder.stop()
@@ -855,7 +862,7 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
             resultVC.filename = self.fileName
         }
         
-        DatabaseManager.shared.recordDiscussionResult(with: discussionId, speakFrequency: frequencySpeak, speakTime: speakingTime, usedQuestions: usedQuestions, initialTime: initialTime, finishTime: finishedTime, responseTypeCnt: responseTypeCnt, completion: {success in
+        DatabaseManager.shared.recordDiscussionResult(with: discussionId, speakFrequency: frequencySpeak, speakTime: speakingTime, usedQuestions: usedQuestions, initialTime: initialTime, finishTime: finishedTime, responseTypeCnt: responseTypeCnt, lineCnt: lineCnt, completion: {success in
             if(success){
 //                print("success")
             }
