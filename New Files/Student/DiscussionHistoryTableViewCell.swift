@@ -33,7 +33,7 @@ class DiscussionHistoryTableViewCell: UITableViewCell {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         contentView.addSubview(discussionNameLabel)
         contentView.addSubview(dateLabel)
-        self.backgroundColor = UIColor(red: 209/255, green: 243/255, blue: 243/255, alpha: 1)
+        self.backgroundColor = UIColor(red: 253/255, green: 242/255, blue: 231/255, alpha: 1)
     }
     
     required init?(coder: NSCoder) {

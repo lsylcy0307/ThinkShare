@@ -14,9 +14,10 @@ class TopicPoppingViewController: UIViewController {
     
     var setting:registeredSetting?
     
-    private var texts = [String]()
-    private var questions = [[String]]()
-    private var textLinks = [String]()
+    public var texts = [String]()
+    public var criterias = [[String]]()
+    public var questions = [[String]]()
+    public var textLinks = [String]()
     
     @IBOutlet var popView: UIView!
     @IBOutlet weak var backBtn: UIButton!
@@ -69,8 +70,8 @@ class TopicPoppingViewController: UIViewController {
         collectionView.isHidden = false
         collectionView.delegate = self
         collectionView.dataSource = self
-        
-        self.loadTexts()
+        self.TexttoView()
+//        self.loadTexts()
     }
     
     override func viewDidLayoutSubviews() {
@@ -96,38 +97,38 @@ class TopicPoppingViewController: UIViewController {
         self.collectionView.reloadData()
     }
     
-    func loadTexts(){
-        spinner.show(in: view)
-        
-        guard let registerdSetting = setting else {return}
-        DatabaseManager.shared.loadSettings(with: registerdSetting, completion: {[weak self] result in
-            guard let strongSelf = self else {
-                return
-            }
-            
-            DispatchQueue.main.async {
-                strongSelf.spinner.dismiss()
-            }
-            
-            switch result {
-            case.success(let texts):
-                print("successfully got")
-                self?.sortData(with: texts)
-            case .failure(_):
-                print("failed to get texts")
-            }
-        })
-        
-    }
-    
-    private func sortData(with textData:[[String:Any]]){
-        for text in textData{
-            texts.append(text["textName"] as! String)
-            questions.append(text["questions"] as! [String])
-            textLinks.append(text["textLink"] as! String)
-        }
-        TexttoView()
-    }
+//    func loadTexts(){
+//        spinner.show(in: view)
+//
+//        guard let registerdSetting = setting else {return}
+//        DatabaseManager.shared.loadSettings(with: registerdSetting, completion: {[weak self] result in
+//            guard let strongSelf = self else {
+//                return
+//            }
+//
+//            DispatchQueue.main.async {
+//                strongSelf.spinner.dismiss()
+//            }
+//
+//            switch result {
+//            case.success(let texts):
+//                print("successfully got")
+//                self?.sortData(with: texts)
+//            case .failure(_):
+//                print("failed to get texts")
+//            }
+//        })
+//
+//    }
+//
+//    private func sortData(with textData:[[String:Any]]){
+//        for text in textData{
+//            criterias.append(text["criterias"] as! [String])
+//            texts.append(text["textName"] as! String)
+//            questions.append(text["questions"] as! [String])
+//            textLinks.append(text["textLink"] as! String)
+//        }
+//    }
     
     func openUrl(urlStr: String!) {
         if let url = URL(string:urlStr), !url.absoluteString.isEmpty {

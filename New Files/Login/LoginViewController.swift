@@ -120,45 +120,40 @@ class LoginViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        //leverage notification  - way app delegate can fire notification and anything that listens it can take action
-        //.didLogInNotification -> extension. swift (handling string more carefully)
         loginObserver = NotificationCenter.default.addObserver(forName: .didLogInNotification ,object: nil, queue: .main, using: {_ in
             
             
-            guard let identity = UserDefaults.standard.value(forKey: "identity") as? String else {
+            guard let window = UIApplication.shared.windows.first(where: { $0.isKeyWindow }) else {
                 return
-           }
-            if (identity == "Students"){
-                print("student")
-                
-                guard let window = UIApplication.shared.windows.first(where: { $0.isKeyWindow }) else {
-                    return
-                }
-                window.rootViewController = ContainerViewController()
-                window.makeKeyAndVisible()
-
             }
-            else if (identity == "Teacher"){
-                
-                print("teacher")
-                guard let window = UIApplication.shared.windows.first(where: { $0.isKeyWindow }) else {
-                    return
-                }
-                window.rootViewController = TeacherContainerViewController()
-                window.makeKeyAndVisible()
-
-            }
+            window.rootViewController = TeacherContainerViewController()
+            window.makeKeyAndVisible()
+            
+//            if (identity == "Students"){
+//                print("student")
+//
+//                guard let window = UIApplication.shared.windows.first(where: { $0.isKeyWindow }) else {
+//                    return
+//                }
+//                window.rootViewController = ContainerViewController()
+//                window.makeKeyAndVisible()
+//
+//            }
+//            else if (identity == "Teacher"){
+//
+//                print("teacher")
+//                guard let window = UIApplication.shared.windows.first(where: { $0.isKeyWindow }) else {
+//                    return
+//                }
+//                window.rootViewController = TeacherContainerViewController()
+//                window.makeKeyAndVisible()
+//
+//            }
         })
-        //once controller dismisses, want to get rid of observation (for memory)
         
         GIDSignIn.sharedInstance()?.presentingViewController = self
         title = "log in"
         view.backgroundColor = .white
-        
-//        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Register", style: .done, target: self, action: #selector(didTapRegister))
-        
-        //add target to a button
         loginButton.addTarget(self,
                               action: #selector(loginButtonTapped),
                               for: .touchUpInside)
@@ -230,16 +225,16 @@ class LoginViewController: UIViewController {
             alertUserLoginError() //password requirement
             return
         }
-        let safeEmail = DatabaseManager.safeEmail(emailAddress: email)
+//        let safeEmail = DatabaseManager.safeEmail(emailAddress: email)
         
-        DatabaseManager.shared.isTeacher(with: safeEmail, completion: { teacher in
-            if teacher {
-                UserDefaults.standard.setValue("Teacher", forKey: "identity")
-            }
-            else{
-                UserDefaults.standard.setValue("Students", forKey: "identity")
-            }
-        })
+//        DatabaseManager.shared.isTeacher(with: safeEmail, completion: { teacher in
+//            if teacher {
+//                UserDefaults.standard.setValue("Teacher", forKey: "identity")
+//            }
+//            else{
+//                UserDefaults.standard.setValue("Students", forKey: "identity")
+//            }
+//        })
         spinner.show(in: view)
         //firebase login
         FirebaseAuth.Auth.auth().signIn(withEmail: email, password: password, completion: {[weak self] authResult, error in
@@ -256,25 +251,30 @@ class LoginViewController: UIViewController {
             }
             
             let user = result.user
-            //save email
             UserDefaults.standard.set(email, forKey: "email")
-            print("logged in user \(user)")
             
-            if (UserDefaults.standard.value(forKey: "identity") as! String == "Students") {
-                guard let window = UIApplication.shared.windows.first(where: { $0.isKeyWindow }) else {
-                    return
-                }
-                window.rootViewController = ContainerViewController()
-                window.makeKeyAndVisible()
+            guard let window = UIApplication.shared.windows.first(where: { $0.isKeyWindow }) else {
+                return
             }
-            else {
-                print("load to a teacher page")
-                guard let window = UIApplication.shared.windows.first(where: { $0.isKeyWindow }) else {
-                    return
-                }
-                window.rootViewController = TeacherContainerViewController()
-                window.makeKeyAndVisible()
-            }
+            window.rootViewController = TeacherContainerViewController()
+            window.makeKeyAndVisible()
+            
+            
+//            if (UserDefaults.standard.value(forKey: "identity") as! String == "Students") {
+//                guard let window = UIApplication.shared.windows.first(where: { $0.isKeyWindow }) else {
+//                    return
+//                }
+//                window.rootViewController = ContainerViewController()
+//                window.makeKeyAndVisible()
+//            }
+//            else {
+//                print("load to a teacher page")
+//                guard let window = UIApplication.shared.windows.first(where: { $0.isKeyWindow }) else {
+//                    return
+//                }
+//                window.rootViewController = TeacherContainerViewController()
+//                window.makeKeyAndVisible()
+//            }
             
             
             strongSelf.navigationController?.dismiss(animated: true, completion: nil)

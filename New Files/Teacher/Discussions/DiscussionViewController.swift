@@ -17,6 +17,10 @@ struct questionSet {
 class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
     
 //    public var sort = ""
+    public var send_texts = [String]()
+    public var send_criterias = [[String]]()
+    public var send_questions = [[String]]()
+    public var send_textLinks = [String]()
     
     public var setting:registeredSetting?
     private let spinner = JGProgressHUD(style: .dark)
@@ -28,7 +32,7 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
     public var modeSwitch = false
     
     var lineCnt = 0
-    
+    var classroomCode = ""
     var unclickedSame = false
     var typeSelected = false
     var selectionType = 0
@@ -36,14 +40,20 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
     
     @IBOutlet weak var timeLabel: UILabel!
     
-    //buttons
+    
     @IBOutlet weak var guideBtn: UIButton!
     @IBOutlet weak var helpBtn: UIButton!
     @IBOutlet weak var textBtn: UIButton!
     
-//    @IBOutlet weak var notification: UILabel!
-    //----
+    
     @IBOutlet weak var currentQuestionLabel: UILabel!
+    @IBOutlet weak var criteria1: UIButton!
+    @IBOutlet weak var criteria4: UIButton!
+    @IBOutlet weak var criteria5: UIButton!
+    @IBOutlet weak var criteria6: UIButton!
+    @IBOutlet weak var criteria3: UIButton!
+    @IBOutlet weak var criteria2: UIButton!
+    
     
     var firstqStart = 0
     var response_type = [String]()
@@ -144,13 +154,6 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
     
     @IBOutlet weak var table: UIImageView!
     
-    @IBOutlet weak var agreementBtn: UIButton!
-    @IBOutlet weak var changeBtn: UIButton!
-    @IBOutlet weak var expandingBtn: UIButton!
-    @IBOutlet weak var disagreementBtn: UIButton!
-    @IBOutlet weak var questionBtn: UIButton!
-    @IBOutlet weak var teacherBtn: UIButton!
-    
     private var questionStart = 0
     private var questionEnd = 0
     
@@ -185,15 +188,22 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
     
     var fileName: String = ""
     
-    //start disucssion -> register question -> set timer/choose questions
-    
     @IBOutlet weak var recordButton: UIButton!
     
     
     override func viewDidLoad() {
-        
         super.viewDidLoad()
+        print(send_criterias)
         view.backgroundColor = .white
+        
+        let criterias:[UIButton] = [criteria1, criteria2, criteria3, criteria4, criteria5, criteria6]
+        
+        for i in 1...send_criterias[0].count {
+            print(criterias[i-1])
+            print(send_criterias[0][i-1])
+            criterias[i-1].setTitle(send_criterias[0][i-1], for: .normal)
+            criterias[i-1].isEnabled = true
+        }
         
         startButton.layer.cornerRadius = 15
         
@@ -235,62 +245,62 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
         }
         
         if modeSwitch == false {
-            agreementBtn.isEnabled = false
-            changeBtn.isEnabled = false
-            expandingBtn.isEnabled = false
-            disagreementBtn.isEnabled = false
-            teacherBtn.isEnabled = false
-            questionBtn.isEnabled = false
+            criteria1.isEnabled = false
+            criteria2.isEnabled = false
+            criteria3.isEnabled = false
+            criteria4.isEnabled = false
+            criteria5.isEnabled = false
+            criteria6.isEnabled = false
             
-            agreementBtn.isHidden = true
-            changeBtn.isHidden = true
-            expandingBtn.isHidden = true
-            disagreementBtn.isHidden = true
-            teacherBtn.isHidden = true
-            questionBtn.isHidden = true
+            criteria1.isHidden = true
+            criteria2.isHidden = true
+            criteria3.isHidden = true
+            criteria4.isHidden = true
+            criteria5.isHidden = true
+            criteria6.isHidden = true
         }
         else {
-            agreementBtn.isEnabled = true
-            changeBtn.isEnabled = true
-            expandingBtn.isEnabled = true
-            disagreementBtn.isEnabled = true
-            teacherBtn.isEnabled = true
-            questionBtn.isEnabled = true
+            criteria1.isEnabled = true
+            criteria2.isEnabled = true
+            criteria3.isEnabled = true
+            criteria4.isEnabled = true
+            criteria5.isEnabled = true
+            criteria6.isEnabled = true
             
-            agreementBtn.isHidden = false
-            changeBtn.isHidden = false
-            expandingBtn.isHidden = false
-            disagreementBtn.isHidden = false
-            teacherBtn.isHidden = false
-            questionBtn.isHidden = false
+            criteria1.isHidden = false
+            criteria2.isHidden = false
+            criteria3.isHidden = false
+            criteria4.isHidden = false
+            criteria5.isHidden = false
+            criteria6.isHidden = false
         }
         
         currentPoint = table.center
         setTable()
         
-        agreementBtn.layer.cornerRadius = 15
-        agreementBtn.layer.borderColor = CGColor(red: 124/255, green: 187/255, blue: 0, alpha: 1)
-        agreementBtn.layer.borderWidth = 5
+        criteria1.layer.cornerRadius = 15
+        criteria1.layer.borderColor = CGColor(red: 124/255, green: 187/255, blue: 0, alpha: 1)
+        criteria1.layer.borderWidth = 5
         
-        disagreementBtn.layer.cornerRadius = 15
-        disagreementBtn.layer.borderColor = CGColor(red: 246/255, green: 83/255, blue: 20/255, alpha: 1)
-        disagreementBtn.layer.borderWidth = 5
+        criteria2.layer.cornerRadius = 15
+        criteria2.layer.borderColor = CGColor(red: 246/255, green: 83/255, blue: 20/255, alpha: 1)
+        criteria2.layer.borderWidth = 5
         
-        expandingBtn.layer.cornerRadius = 15
-        expandingBtn.layer.borderColor = CGColor(red: 255/255, green: 187/255, blue: 0, alpha: 1)
-        expandingBtn.layer.borderWidth = 5
+        criteria3.layer.cornerRadius = 15
+        criteria3.layer.borderColor = CGColor(red: 255/255, green: 187/255, blue: 0, alpha: 1)
+        criteria3.layer.borderWidth = 5
         
-        changeBtn.layer.cornerRadius = 15
-        changeBtn.layer.borderColor = CGColor(red: 0/255, green: 161/255, blue: 241/255, alpha: 1)
-        changeBtn.layer.borderWidth = 5
+        criteria4.layer.cornerRadius = 15
+        criteria4.layer.borderColor = CGColor(red: 0/255, green: 161/255, blue: 241/255, alpha: 1)
+        criteria4.layer.borderWidth = 5
         
-        questionBtn.layer.cornerRadius = 15
-        questionBtn.layer.borderColor = CGColor(red: 255/255, green: 147/255, blue: 0/255, alpha: 1)
-        questionBtn.layer.borderWidth = 5
+        criteria5.layer.cornerRadius = 15
+        criteria5.layer.borderColor = CGColor(red: 255/255, green: 147/255, blue: 0/255, alpha: 1)
+        criteria5.layer.borderWidth = 5
         
-        teacherBtn.layer.cornerRadius = 15
-        teacherBtn.layer.borderColor = CGColor(red: 148/255, green: 55/255, blue: 255/255, alpha: 1)
-        teacherBtn.layer.borderWidth = 5
+        criteria6.layer.cornerRadius = 15
+        criteria6.layer.borderColor = CGColor(red: 148/255, green: 55/255, blue: 255/255, alpha: 1)
+        criteria6.layer.borderWidth = 5
     }
     
     func getDirectory() -> URL {
@@ -390,22 +400,28 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
     
     @objc func on_Q_Notification(notification:Notification)
     {
-        
         if let dict = notification.userInfo as NSDictionary? {
             print("called")
             if let question = dict["question"] as? String,
                let newQuestions = dict["new_questions"] as? [String],
                let verystartTime = dict["time"] as? Int
             {
-                
                 firstqStart = verystartTime * 60
-//                print(firstqStart)
-                
+                print(newQuestions)
                 for i in newQuestions {
                     selectedQuestions.append(i)
                     registeredQuestions.append(i)
-                    //update registered questions
                 }
+//                if newQuestions.isEmpty != true{
+//                    DatabaseManager.shared.addQuestions(discussionID: discussionId, newQs: newQuestions, completion: {success in
+//                        if(success){
+//                            print("questions recorded")
+//                        }
+//                        else{
+//                            print("error recording")
+//                        }
+//                    })
+//                }
                 if (receivedFirstQ == true){
                     usedQuestions.append(questionSet(question: currentQuestion, duration: questionStart-count))
                 }
@@ -426,8 +442,6 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
         }
         
         currentQuestionLabel.text = self.currentQuestion
-        
-        
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -474,8 +488,11 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
         
         if(segue.identifier == "topicPopoverSeg"){
             let displayVC = segue.destination as! TopicPoppingViewController
-            
             displayVC.setting = setting
+            displayVC.texts = send_texts
+            displayVC.criterias = send_criterias
+            displayVC.questions = send_questions
+            displayVC.textLinks = send_textLinks
         }
         
     }
@@ -568,27 +585,27 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
         var type = 0
         switch sender.tag{
         case 1:
-            selectedRespBtn = agreementBtn
+            selectedRespBtn = criteria1
             type = 1
             responseTypeCnt[0] += 1
         case 2:
-            selectedRespBtn = changeBtn
+            selectedRespBtn = criteria2
             type = 2
             responseTypeCnt[1] += 1
         case 3:
-            selectedRespBtn = expandingBtn
+            selectedRespBtn = criteria3
             type = 3
             responseTypeCnt[2] += 1
         case 4:
-            selectedRespBtn = disagreementBtn
+            selectedRespBtn = criteria4
             type = 4
             responseTypeCnt[3] += 1
         case 5:
-            selectedRespBtn = questionBtn
+            selectedRespBtn = criteria5
             type = 5
             responseTypeCnt[4] += 1
         case 6:
-            selectedRespBtn = teacherBtn
+            selectedRespBtn = criteria6
             type = 6
             responseTypeCnt[5] += 1
         default:
@@ -596,7 +613,7 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
             
         }
         selectedRespBtn.isEnabled = false
-        response_type.append(responsetypes[sender.tag-1])
+        response_type.append(send_criterias[0][sender.tag-1])
         
         //enable speaking buttons
         if(modeSwitch == true){
@@ -610,9 +627,6 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
                 addLine(toPoint: prevBtn.center, lineType: prev_type_response, type: type)
                 firstresponseType = true
             }
-        }
-        else if (modeSwitch == false){
-            //if not reflection mode
         }
     }
     
@@ -716,6 +730,15 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
     private func presentoptions(){
         self.addToFlow(person: partNames[index].text!, startTime: startTime, endTime: endTime, duration: duration, responseType:response_type, responseAList:responseList, responseBList:responseBList)
         
+        if (modeSwitch == false){
+            for (element, _) in tableConfig {
+                self.buttons[element-1].isEnabled = buttonEnabes[element-1]
+            }
+            addLine(toPoint: prevBtn.center, lineType: nil, type: nil)
+            
+        }
+        
+        
         if(selectionType==0){
             sameBtn = true
         }
@@ -733,7 +756,7 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
         secondPoint = nil
     }
     
-    func addLine(toPoint end:CGPoint, lineType:String, type: Int) {
+    func addLine(toPoint end:CGPoint, lineType:String?, type: Int?) {
         let line = CAShapeLayer()
         let linePath = UIBezierPath()
         
@@ -770,10 +793,10 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
             else{
                 line.strokeColor = UIColor(red: 148/255, green: 55/255, blue: 255/255, alpha: 1).cgColor
             }
+            prev_lineType = lineType!
         }
-        
-        prev_lineType = lineType
-        
+    
+
         line.lineWidth = 2
         line.lineJoin = CAShapeLayerLineJoin.round
         self.view.layer.addSublayer(line)
@@ -870,18 +893,21 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
 
     
     func discussionEnded(){
-        
-//        if !(btnQueue.last?.backgroundColor == .none){
-//            print("the last person was not recorded")
-//            self.addToFlow(person: partNames[index].text!, startTime: startTime, endTime: endTime, duration: duration, responseType:response_type, responseAList:responseList, responseBList:responseBList)
-//        }
-        
         usedQuestions.append(questionSet(question: currentQuestion, duration: questionStart-count))
         
         finishedTime = count
         
+        print("result---")
+        print("names---")
+        print(tableNames)
+        print("speakingTime---")
+        print(speakingTime)
+        print("frequencySpeak---")
+        print(frequencySpeak)
+        
         let resultVC = ResultViewController()
         
+        resultVC.modeSwitch = modeSwitch
         resultVC.tableName = self.tableNames
         resultVC.speakFrequency = self.frequencySpeak
         resultVC.discussionId = self.discussionId
@@ -892,7 +918,8 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
         resultVC.responseTypeCnt = self.responseTypeCnt
         resultVC.numParticipants = self.numParticipants
         resultVC.lineCnt = self.lineCnt
-        resultVC.sort = self.sort
+        resultVC.send_criterias = self.send_criterias[0]
+//        resultVC.sort = self.sort
         
         if isRecording {
             soundRecorder.stop()
@@ -900,7 +927,7 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
             resultVC.filename = self.fileName
         }
         
-        DatabaseManager.shared.recordDiscussionResult(with: discussionId, speakFrequency: frequencySpeak, speakTime: speakingTime, usedQuestions: usedQuestions, initialTime: initialTime, finishTime: finishedTime, responseTypeCnt: responseTypeCnt, lineCnt: lineCnt, completion: {success in
+        DatabaseManager.shared.recordDiscussionResult(with: discussionId, speakFrequency: frequencySpeak, speakTime: speakingTime, usedQuestions: usedQuestions, initialTime: initialTime, finishTime: finishedTime, responseTypeCnt: responseTypeCnt, lineCnt: lineCnt, names: tableNames, classroomCode: classroomCode, completion: {success in
             if(success){
 //                print("success")
             }
@@ -946,18 +973,15 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
     }
     
     func resetBtn(){
-        agreementBtn.isEnabled = true
-        disagreementBtn.isEnabled = true
-        expandingBtn.isEnabled = true
-        changeBtn.isEnabled = true
-        teacherBtn.isEnabled = true
-        questionBtn.isEnabled = true
+        let criterias:[UIButton] = [criteria1, criteria2, criteria3, criteria4, criteria5, criteria6]
+        for i in 1...send_criterias[0].count {
+            criterias[i-1].isEnabled = true
+        }
     }
     
     func showAlert(){
         let alert = UIAlertController(title: "Speak Up Time", message: "participants who spoke less than the table average will be given time to speak up from now to the end of the discussion!", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "okay", style: .cancel, handler: {action in
-//            print("tapped okay")
             self.count = self.count - 1
             self.startStopClicked()
         }))

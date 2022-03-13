@@ -124,6 +124,7 @@ extension ViewRegisteredViewController: UITableViewDelegate, UITableViewDataSour
         let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
         let discussionVC = storyBoard.instantiateViewController(withIdentifier: "createView") as! createGroupViewController
         discussionVC.setting = selectedModel
+//        discussionVC.sort = "s"
         discussionVC.title = selectedModel.code
         
         let navVC = UINavigationController(rootViewController: discussionVC)
@@ -133,5 +134,27 @@ extension ViewRegisteredViewController: UITableViewDelegate, UITableViewDataSour
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat{
         return 90
+    }
+    
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+            if editingStyle == .delete {
+                // begin delete
+                let discussioncode = settings[indexPath.row].code
+                tableView.beginUpdates()
+                self.settings.remove(at: indexPath.row)
+                tableView.deleteRows(at: [indexPath], with: .left)
+
+                DatabaseManager.shared.deleteCodeRegistered(discussioncode: discussioncode, completion: { success in
+                    if !success {
+                        // add  model and row back and show error alert
+                    }
+                })
+
+                tableView.endUpdates()
+            }
+        }
+    
+    func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
+        return .delete
     }
 }

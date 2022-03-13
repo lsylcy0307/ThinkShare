@@ -61,10 +61,14 @@ class QuestionPopViewController: UIViewController {
     
     @IBAction func addQuestion(_ sender: Any) {
         let question = questionField.text!
-        newquestions.append(question)
-        questions.append(question)
-        collectionView.reloadData()
-        questionField.text = ""
+        if (question != ""){
+            newquestions.append(question)
+            questions.append(question)
+            collectionView.reloadData()
+            questionField.text = ""
+//            NotificationCenter.default.post(name: DiscussionViewController.questionNotification, object: nil, userInfo: ["question": selectedQ, "new_questions": newquestions, "time" : minute])
+                //cannot call notification from extension?
+        }
     }
     
     
@@ -121,6 +125,8 @@ extension QuestionPopViewController: UICollectionViewDelegate, UICollectionViewD
         selectedQ = questions[indexPath.row]
         
         NotificationCenter.default.post(name: DiscussionViewController.questionNotification, object: nil, userInfo: ["question": selectedQ, "new_questions": newquestions, "time" : minute])
+        
+        newquestions = []
         
         if firstq == false {
             callback?(minute)

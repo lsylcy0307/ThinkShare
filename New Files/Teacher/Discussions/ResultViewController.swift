@@ -14,10 +14,11 @@ struct flow {
 class ResultViewController: UIViewController, ChartViewDelegate, UITableViewDelegate, UITableViewDataSource,AVAudioPlayerDelegate, AVAudioRecorderDelegate, UICollectionViewDelegate, UICollectionViewDataSource{
     
 //    public var sort = ""
-    
+    public var modeSwitch = false
     var soundPlayer : AVAudioPlayer!
     var discussionFlows = [flow]()
     public var lineCnt = 0
+    public var send_criterias = [String]()
     
     var pieChart = PieChartView()
     var barChart = BarChartView()
@@ -197,6 +198,7 @@ class ResultViewController: UIViewController, ChartViewDelegate, UITableViewDele
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        print(send_criterias)
         self.title = "Discussion Analytics"
         print("filename: \(filename)")
         view.backgroundColor = .white
@@ -264,17 +266,16 @@ class ResultViewController: UIViewController, ChartViewDelegate, UITableViewDele
         collectionView.delegate = self
         collectionView.backgroundColor = .white
         
-
-        greenView.addSubview(collectionView)
-                                                                            
-    
+        if modeSwitch == true{
+            greenView.addSubview(collectionView)
+        }
+        
         greenView.addSubview(spokenLabel)
         pinkView.addSubview(titleLabel)
         tablesTitleView.addSubview(tableTitleLabel)
 //        purpleView.addSubview(durationLabel)
         orangeView.addSubview(questionTableView)
         orangeView.addSubview(questionLabel)
-//        orangeView.addSubview(questionTotalLabel)
         
         view.addSubview(durationtitleLabel)
         durationView.addSubview(timeLabel)
@@ -491,7 +492,7 @@ class ResultViewController: UIViewController, ChartViewDelegate, UITableViewDele
         if tableView == self.tableView
         {
             let cell = tableView.dequeueReusableCell(withIdentifier: "resultCell", for: indexPath)
-            cell.textLabel?.text = "\(responseTypes[indexPath.row]): \(responseTypeCnt[indexPath.row])"
+            cell.textLabel?.text = "\(send_criterias[indexPath.row]): \(responseTypeCnt[indexPath.row])"
             return cell
         } else {
             let cell = tableView.dequeueReusableCell(withIdentifier: QuestionTableViewCell.identifier, for: indexPath) as! QuestionTableViewCell
@@ -528,13 +529,13 @@ class ResultViewController: UIViewController, ChartViewDelegate, UITableViewDele
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 6
+        return send_criterias.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ResponseCollectionViewCell.identifier, for: indexPath) as! ResponseCollectionViewCell
         let color: [UIColor] = [.green, .blue, .yellow, .red, .orange, .purple]
-        cell.configure(type: responseTypes[indexPath.row], count: responseTypeCnt[indexPath.row], color: color[indexPath.row])
+        cell.configure(type: send_criterias[indexPath.row], count: responseTypeCnt[indexPath.row], color: color[indexPath.row])
         print(responseTypeCnt[indexPath.row])
         return cell
     }

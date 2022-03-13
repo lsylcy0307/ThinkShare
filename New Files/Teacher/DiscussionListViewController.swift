@@ -12,6 +12,7 @@ protocol TeacherHomeViewControllerDelegate: AnyObject {
     func didTapMenuButton()
 }
 
+
 class DiscussionListViewController: UIViewController {
     weak var delegate: TeacherHomeViewControllerDelegate?
     private let spinner = JGProgressHUD(style: .dark)
@@ -50,8 +51,6 @@ class DiscussionListViewController: UIViewController {
         view.addSubview(noDiscussionsLabel)
         setupTableView()
         getRegisteredDiscussions()
-        
-        
     }
     
     @objc func TapMenuButton(){
@@ -137,5 +136,27 @@ extension DiscussionListViewController: UITableViewDelegate, UITableViewDataSour
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat{
         return 90
+    }
+    
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+            if editingStyle == .delete {
+                // begin delete
+                let settingcode = discussions[indexPath.row].code
+                tableView.beginUpdates()
+                self.discussions.remove(at: indexPath.row)
+                tableView.deleteRows(at: [indexPath], with: .left)
+
+                DatabaseManager.shared.deleteSettingRegistered(settingcode: settingcode, completion: { success in
+                    if !success {
+                        // add  model and row back and show error alert
+                    }
+                })
+
+                tableView.endUpdates()
+            }
+        }
+    
+    func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
+        return .delete
     }
 }

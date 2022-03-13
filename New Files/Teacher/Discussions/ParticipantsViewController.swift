@@ -1,10 +1,17 @@
 import UIKit
+import JGProgressHUD
  
 class ParticipantsViewController: UIViewController{
-    
+    private let spinner = JGProgressHUD(style: .dark)
 //    public var sort = ""
     public var classroomCode = ""
     private var discussion_id = ""
+    
+    private var texts = [String]()
+    private var criterias = [[String]]()
+    private var questions = [[String]]()
+    private var textLinks = [String]()
+    
     //tableSettings
     
     public var setting:registeredSetting?
@@ -218,14 +225,14 @@ class ParticipantsViewController: UIViewController{
     
     
     @objc private func didTapContinue() {
-        print("continue tapped")
+        spinner.show(in: view)
         guard let registeredSetting = setting else {return}
         
         DatabaseManager.shared.createNewDiscussionGroup(with: registeredSetting.code, teacherName: registeredSetting.teacherName, teacherEmail: registeredSetting.teacherEmail, num_students: num_students, groupName: groupName, tableSetting: disucssionTable, nameSetting:nameSetting, classCode: classroomCode , completion: { [weak self] result in
             switch result {
             case .success(let discussionId):
                 self?.discussion_id = discussionId
-                self?.changeVC()
+                self?.getSettings()
                 print(discussionId)
             case .failure(let error):
                 print("Failed to get the discussion id: \(error)")
@@ -233,16 +240,51 @@ class ParticipantsViewController: UIViewController{
         })
     }
     
+    private func getSettings(){
+        guard let registerdSetting = setting else {return}
+        DatabaseManager.shared.loadSettings(with: registerdSetting, completion: {[weak self] result in
+            guard let strongSelf = self else {
+                return
+            }
+            DispatchQueue.main.async {
+                strongSelf.spinner.dismiss()
+            }
+            switch result {
+            case.success(let texts):
+                print("successfully got")
+                self?.sortData(with: texts)
+            case .failure(_):
+                print("failed to get texts")
+            }
+        })
+    }
+    
+    private func sortData(with textData:[[String:Any]]){
+        for text in textData{
+            print(text)
+            criterias.append(text["criterias"] as! [String])
+            texts.append(text["textName"] as! String)
+            questions.append(text["questions"] as! [String])
+            textLinks.append(text["textLink"] as! String)
+        }
+        self.changeVC()
+    }
+    
     private func changeVC(){
         
         let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
         let mainViewController = storyBoard.instantiateViewController(withIdentifier: "discussionFlowView") as! DiscussionViewController
         
-        
+        mainViewController.classroomCode = classroomCode
         mainViewController.setting = setting
         mainViewController.tableSetting = disucssionTable
         mainViewController.names = nameSetting
-//        mainViewController.sort = sort
+        
+        mainViewController.send_texts = texts
+        mainViewController.send_criterias = criterias
+        mainViewController.send_questions = questions
+        mainViewController.send_textLinks = textLinks
+        
         mainViewController.discussionId = discussion_id
         mainViewController.modeSwitch = modeSwitch
         navigationController?.pushViewController(mainViewController, animated: true)

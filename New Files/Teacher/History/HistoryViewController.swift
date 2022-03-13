@@ -11,6 +11,11 @@ struct discussionHistory {
     let date: String
 }
 
+struct studentRecord {
+    let date: String
+    let speakTime: String
+}
+
 struct Setup {
     let date: String
     let groupName: String
@@ -20,6 +25,7 @@ struct Setup {
     let names: [String]
     let numParticipants: Int
     let tableSetting: [Int]
+    let teacherEmail: String
 }
 
 struct DiscResult {
@@ -39,10 +45,11 @@ import JGProgressHUD
 
 class HistoryViewController: UIViewController {
     weak var popDelegate:popClassVCDelegate?
-    public var sort=""
+//    public var sort=""
     public var classInfo:classrooms?
     var discussionId = ""
     var discussionFlows = [flow]()
+    var settingInfo: discussionSetting?
     var discussionSetup: Setup?
     var discussionResult: DiscResult?
     let responseTypes = ["agreement", "change", "expand", "disagreement"]
@@ -102,6 +109,7 @@ class HistoryViewController: UIViewController {
         view.tag = 8
         view.addSubview(tableView)
         view.addSubview(noSettingsLabel)
+        view.addSubview(backButton)
 //        guard let identity = UserDefaults.standard.value(forKey: "identity") as? String else {
 //            return
 //       }
@@ -145,7 +153,7 @@ class HistoryViewController: UIViewController {
             return
         }
         let safeEmail = DatabaseManager.safeEmail(emailAddress: email)
-        print(sort)
+//        print(sort)
         DatabaseManager.shared.getAllDiscussionHistory(for: safeEmail, classroomCode: classInfo?.code,completion: { [weak self] result in
             switch result {
             case .success(let histories):
@@ -192,8 +200,6 @@ class HistoryViewController: UIViewController {
 extension HistoryViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        print(discussions.count)
-        print(discussions)
         return discussions.count
     }
     
@@ -213,7 +219,6 @@ extension HistoryViewController: UITableViewDelegate, UITableViewDataSource {
         let discussionID = selectedModel.code
         
         self.discussionId = discussionID
-        print(self.discussionId)
         self.loadDiscussionSetting()
         
         tableView.deselectRow(at: indexPath, animated: true)
@@ -253,14 +258,26 @@ extension HistoryViewController: UITableViewDelegate, UITableViewDataSource {
         }
         let safeEmail = DatabaseManager.safeEmail(emailAddress: email)
     
-        DatabaseManager.shared.getDiscussionSettings(with: safeEmail, sort: sort, classroomCode: classInfo!.code, discussionID: discussionId, completion: { [weak self] result in
+        DatabaseManager.shared.getDiscussionSettings(with: safeEmail, classroomCode: classInfo!.code, discussionID: discussionId, completion: { [weak self] result in
             switch result {
             case .success(let setup):
                 self?.discussionSetup = setup
+                self?.getSettingInfo()
                 self?.getDiscussionFlow()
                 self?.getDiscussionResult()
             case .failure(let error):
                 print("failed to get settings: \(error)")
+            }
+        })
+    }
+    
+    private func getSettingInfo(){
+        DatabaseManager.shared.getSettingInfo(with: discussionSetup!.teacherEmail, code: discussionSetup!.settingCode, completion: { [weak self] result in
+            switch result {
+            case .success(let setup):
+                self?.settingInfo = setup
+            case .failure(let error):
+                print("failed to get flows: \(error)")
             }
         })
     }
@@ -304,9 +321,6 @@ extension HistoryViewController: UITableViewDelegate, UITableViewDataSource {
         finishTime = self.discussionResult!.finishTime
         lineCnt = self.discussionResult!.lineCnt
         
-//        let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
-//        let resultVC = storyBoard.instantiateViewController(withIdentifier: "resultView") as! ResultViewController
-        
         let resultVC = ResultViewController()
         
         resultVC.tableName = names
@@ -319,6 +333,7 @@ extension HistoryViewController: UITableViewDelegate, UITableViewDataSource {
         resultVC.finishTime = finishTime
         resultVC.numParticipants = discussionSetup!.numParticipants
         resultVC.responseTypeCnt = responseTypeCnt
+        resultVC.send_criterias = settingInfo!.criteria
         
         
         let navVC = UINavigationController(rootViewController: resultVC)

@@ -119,7 +119,7 @@ class RegisterSettingViewController: UIViewController {
                 
             }
             print("not registered yet")
-            DatabaseManager.shared.findUserWithCode(with: code, completion: {[weak self] found in
+            DatabaseManager.shared.findUserWithCode(with: code, classCode: nil, completion: {[weak self] found in
                 if found {
                     print("success")
                     strongSelf.alerUserSuccess()

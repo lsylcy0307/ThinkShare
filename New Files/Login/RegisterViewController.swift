@@ -7,11 +7,11 @@ final class RegisterViewController: UIViewController {
 
 //    private let spinner = JGProgressHUD(style: .dark)
 
-    let menu: DropDown = {
-        let menu = DropDown()
-        menu.dataSource = ["Teacher", "Students"]
-        return menu
-    }()
+//    let menu: DropDown = {
+//        let menu = DropDown()
+//        menu.dataSource = ["Teacher", "Students"]
+//        return menu
+//    }()
     
     private let scrollView: UIScrollView = {
         let scrollView = UIScrollView()
@@ -93,15 +93,15 @@ final class RegisterViewController: UIViewController {
         return field
     }()
     
-    private let identityField: UILabel = {
-        let field = UILabel()
-        field.layer.cornerRadius = 12
-        field.layer.borderWidth = 1
-        field.layer.borderColor = UIColor.lightGray.cgColor
-        field.text = "Are you a..."
-        field.backgroundColor = .white
-        return field
-    }()
+//    private let identityField: UILabel = {
+//        let field = UILabel()
+//        field.layer.cornerRadius = 12
+//        field.layer.borderWidth = 1
+//        field.layer.borderColor = UIColor.lightGray.cgColor
+//        field.text = "Are you a..."
+//        field.backgroundColor = .white
+//        return field
+//    }()
 
     private let passwordField: UITextField = {
         let field = UITextField()
@@ -135,14 +135,9 @@ final class RegisterViewController: UIViewController {
         title = "Register"
         view.backgroundColor = .systemBackground
 
-//        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Register",
-//                                                            style: .done,
-//                                                            target: self,
-//                                                            action: #selector(didTapRegister))
-
-//        registerButton.addTarget(self,
-//                              action: #selector(registerButtonTapped),
-//                              for: .touchUpInside)
+        registerButton.addTarget(self,
+                              action: #selector(registerButtonTapped),
+                              for: .touchUpInside)
 
         emailField.delegate = self
         passwordField.delegate = self
@@ -152,7 +147,7 @@ final class RegisterViewController: UIViewController {
 //        scrollView.addSubview(imageView)
         scrollView.addSubview(registerLabel)
         scrollView.addSubview(infoLabel)
-        scrollView.addSubview(identityField)
+//        scrollView.addSubview(identityField)
         scrollView.addSubview(firstNameField)
         scrollView.addSubview(lastNameField)
         scrollView.addSubview(emailField)
@@ -162,24 +157,24 @@ final class RegisterViewController: UIViewController {
         imageView.isUserInteractionEnabled = false
         scrollView.isUserInteractionEnabled = true
         
-        menu.anchorView = identityField
+//        menu.anchorView = identityField
       
-        let gesture = UITapGestureRecognizer(target: self,
-                                             action: #selector(didTapIdentitySet))
-        self.identityField.isUserInteractionEnabled = true
-        gesture.numberOfTouchesRequired = 1
-        gesture.numberOfTapsRequired = 1
-        identityField.addGestureRecognizer(gesture)
+//        let gesture = UITapGestureRecognizer(target: self,
+//                                             action: #selector(didTapIdentitySet))
+//        self.identityField.isUserInteractionEnabled = true
+//        gesture.numberOfTouchesRequired = 1
+//        gesture.numberOfTapsRequired = 1
+//        identityField.addGestureRecognizer(gesture)
         
-        menu.selectionAction = { index, title in
-            print("index \(index) and \(title)")
-            self.identityField.text = title
-        }
+//        menu.selectionAction = { index, title in
+//            print("index \(index) and \(title)")
+//            self.identityField.text = title
+//        }
     }
     
     @objc func didTapIdentitySet(){
         print("tapped")
-        menu.show()
+//        menu.show()
         
     }
     
@@ -208,12 +203,12 @@ final class RegisterViewController: UIViewController {
                                      y: emailField.bottom+10,
                                      width: registerLabel.width,
                                      height: 52)
-        identityField.frame = CGRect(x:  (view.frame.size.width-250)/4,
-                                     y: passwordField.bottom+10,
-                                     width: registerLabel.width,
-                                     height: 52)
-        registerButton.frame = CGRect(x: identityField.right - 180,
-                                   y: identityField.bottom+10,
+//        identityField.frame = CGRect(x:  (view.frame.size.width-250)/4,
+//                                     y: passwordField.bottom+10,
+//                                     width: registerLabel.width,
+//                                     height: 52)
+        registerButton.frame = CGRect(x: passwordField.right - 180,
+                                   y: passwordField.bottom+10,
                                    width: 180,
                                    height: 52)
         
@@ -229,11 +224,11 @@ final class RegisterViewController: UIViewController {
         guard let firstName = firstNameField.text,
             let lastName = lastNameField.text,
             let email = emailField.text,
-            let identity = identityField.text,
+//            let identity = identityField.text,
             let password = passwordField.text,
             !email.isEmpty,
             !password.isEmpty,
-            !identity.isEmpty,
+//            !identity.isEmpty,
             !firstName.isEmpty,
             !lastName.isEmpty,
             password.count >= 6 else {
@@ -266,38 +261,34 @@ final class RegisterViewController: UIViewController {
                 }
 
                 UserDefaults.standard.setValue(email, forKey: "email")
-                UserDefaults.standard.setValue(identity, forKey: "identity")
+//                UserDefaults.standard.setValue(identity, forKey: "identity")
                 UserDefaults.standard.setValue("\(firstName) \(lastName)", forKey: "name")
 
 
                 let chatUser = HarknessAppUser(firstName: firstName,
                                           lastName: lastName,
-                                          emailAddress: email,
-                                          identity: identity)
+                                          emailAddress: email)
                 DatabaseManager.shared.insertUser(with: chatUser, completion: { success in
                     if success {
                         print("inserted new user")
                     }
                 })
-                guard let identity = UserDefaults.standard.value(forKey: "identity") as? String else {
+                guard let window = UIApplication.shared.windows.first(where: { $0.isKeyWindow }) else {
                     return
                 }
-                guard let strongSelf = self else{
-                    return
-                }
-                if (identity == "Students"){
-                    let vc = MenusViewController()
-                    let nav = UINavigationController(rootViewController: vc)
-                    nav.modalPresentationStyle = .fullScreen //don't want user to dismiss the login page
-                    strongSelf.present(nav, animated: true)
-                }
-                else if (identity == "Teacher"){
-                    let vc = TeacherMenuViewController()
-                    let nav = UINavigationController(rootViewController: vc)
-                    nav.modalPresentationStyle = .fullScreen //don't want user to dismiss the login page
-                    strongSelf.present(nav, animated: true)
-                }
+                window.rootViewController = TeacherContainerViewController()
+                window.makeKeyAndVisible()
                 
+//                if (identity == "Students"){
+//                    guard let window = UIApplication.shared.windows.first(where: { $0.isKeyWindow }) else {
+//                        return
+//                    }
+//                    window.rootViewController = ContainerViewController()
+//                    window.makeKeyAndVisible()
+//                }
+//                else if (identity == "Teacher"){
+//
+//                }
             })
         })
     }

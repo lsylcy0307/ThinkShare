@@ -9,7 +9,7 @@ class TaskView: UIView, InputViewDelegate, CriteriaViewDelegate {
 //    func onCriteriaRemove(_ view: CriteriaView) {
 //        <#code#>
 //    }
-//    
+    var cnt = 0
     func onInputRemove(_ view: CriteriaView) {
         if let first = self.stackView.arrangedSubviews.first(where: { $0 === view }) {
             UIView.animate(withDuration: 0.3, animations: {
@@ -22,6 +22,7 @@ class TaskView: UIView, InputViewDelegate, CriteriaViewDelegate {
     }
     
     func onCriteriaRemove(_ view: CriteriaView) {
+        cnt -= 1
         if let first = self.stackView.arrangedSubviews.first(where: { $0 === view }) {
             UIView.animate(withDuration: 0.3, animations: {
                 first.isHidden = true
@@ -29,6 +30,9 @@ class TaskView: UIView, InputViewDelegate, CriteriaViewDelegate {
             }) { (_) in
                 self.stackView.layoutIfNeeded()
             }
+        }
+        if(cnt<6){
+            addCriteriaButton.isEnabled = true
         }
     }
     
@@ -172,6 +176,7 @@ class TaskView: UIView, InputViewDelegate, CriteriaViewDelegate {
     
     lazy var addCriteriaButton: UIButton  = {
         let button = UIButton()
+        button.isEnabled = true
         button.setTitle("+", for: .normal)
         button.setTitleColor(UIColor(cgColor: CGColor(red: 0/255, green: 0/255, blue: 255/255, alpha: 1)), for: .normal)
         button.addTarget(self, action: #selector(addMoreCriteriaField), for: .touchUpInside)
@@ -232,12 +237,17 @@ class TaskView: UIView, InputViewDelegate, CriteriaViewDelegate {
     }
     
     @objc func addMoreCriteriaField(){
+        cnt += 1
         let view = CriteriaView(delegate: self)
         let constraint1 = view.heightAnchor.constraint(lessThanOrEqualToConstant: 400.0)
         constraint1.isActive = true
         self.criteriaStackView.addArrangedSubview(view)
         self.criteriaStackView.layoutIfNeeded()
         self.stackView.layoutIfNeeded()
+        
+        if cnt >= 6 {
+            addCriteriaButton.isEnabled = false
+        }
     }
     
     @objc

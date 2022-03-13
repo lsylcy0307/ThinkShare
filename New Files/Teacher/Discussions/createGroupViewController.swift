@@ -3,22 +3,20 @@
 import UIKit
 import JGProgressHUD
 
-class createGroupViewController: UIViewController, NamesViewDelegate {
+class createGroupViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
-    public var sort = ""
+//    public var sort = ""
     public var classroomCode = ""
     private let spinner = JGProgressHUD(style: .dark)
-    var student_names = [String]()
+//    public var student_names = [String]()
     
     var setting:registeredSetting?
-    var names = [String]()
+    public var names = [String]()
     var modeSwitch = false
     
     private var discussion_id = ""
     
     @IBOutlet weak var groupNameField: UITextField!
-//    @IBOutlet weak var numBoysField: UITextField!
-    @IBOutlet weak var addBtn: UIButton!
     
     @IBOutlet weak var `switch`: UISwitch!
     
@@ -26,7 +24,12 @@ class createGroupViewController: UIViewController, NamesViewDelegate {
     @IBOutlet weak var continueBtn: UIButton!
     
     @IBOutlet weak var namesView: UIView!
-    @IBOutlet weak var stepper: UIStepper! //adding participants
+    
+    private let tableView:UITableView = {
+        let table = UITableView()
+        table.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
+        return table
+    }()
     
     lazy var scrollView: UIScrollView = {
         let scrollView = UIScrollView()
@@ -59,8 +62,7 @@ class createGroupViewController: UIViewController, NamesViewDelegate {
         super.viewDidLoad()
         view.backgroundColor = .white
         `switch`.setOn(false, animated: false)
-        addBtn.isEnabled = true
-        
+        print("student names: \(names)")
         backBtn.layer.cornerRadius = 12
         continueBtn.layer.cornerRadius = 12
         
@@ -68,38 +70,28 @@ class createGroupViewController: UIViewController, NamesViewDelegate {
         
         [groupNameField].forEach({ $0.addTarget(self, action: #selector(editingChanged), for: .editingChanged) })
         
-        namesView.addSubview(scrollView)
-        scrollView.addSubview(taskStackView)
+//        namesView.addSubview(scrollView)
+        namesView.addSubview(tableView)
         
-        scrollView.snp.makeConstraints { (make) in
-            make.edges.equalTo(namesView)
-        }
-        
-        taskStackView.snp.makeConstraints { (make) in
-            make.edges.equalToSuperview()
-            make.width.equalTo(scrollView)
-        }
+        tableView.delegate = self
+        tableView.dataSource = self
+        tableView.backgroundColor = .white
+//
+//        scrollView.snp.makeConstraints { (make) in
+//            make.edges.equalTo(namesView)
+//        }
+//
+//        taskStackView.snp.makeConstraints { (make) in
+//            make.edges.equalToSuperview()
+//            make.width.equalTo(scrollView)
+//        }
     }
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         //scrollView doesn't scroll to the bottom
-        scrollView.frame = namesView.bounds
+        tableView.frame = namesView.bounds
     }
-    
-    @IBAction func addPart(_ sender: Any) {
-        count += 1
-        let view = NamesView(delegate: self)
-        let constraint1 = view.heightAnchor.constraint(lessThanOrEqualToConstant: 85)
-        constraint1.isActive = true
-        self.taskStackView.addArrangedSubview(view)
-        self.view.layoutIfNeeded()
-        
-        if count >= 14 {
-            addBtn.isEnabled = false
-        }
-    }
-    
     
     func onRemove(_ view: NamesView) {
         count -= 1
@@ -176,33 +168,47 @@ class createGroupViewController: UIViewController, NamesViewDelegate {
     
     func save(){
         
-        var nameData = [String]()
-        
-        for eachStackView in self.taskStackView.arrangedSubviews {
-            if let taskview = eachStackView as? NamesView
-            {
-                guard let name = taskview.NamesInput.text else {
-                    return
-                }
-                nameData.append(name)
-            }
-        }
-        
-        spinner.show(in: view)
-        names = nameData
+//        var nameData = [String]()
+//
+//        for eachStackView in self.taskStackView.arrangedSubviews {
+//            if let taskview = eachStackView as? NamesView
+//            {
+//                guard let name = taskview.NamesInput.text else {
+//                    return
+//                }
+//                nameData.append(name)
+//            }
+//        }
+//
+//        spinner.show(in: view)
+//        names = nameData
         
         guard let groupName = groupNameField.text else {return}
         
         let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
         let mainViewController = storyBoard.instantiateViewController(withIdentifier: "ParticipantsView") as! ParticipantsViewController
-        mainViewController.participant = count
+        mainViewController.participant = names.count
         mainViewController.classroomCode = classroomCode
         mainViewController.partNames = names
         mainViewController.setting = setting
-        mainViewController.num_students = count
+        mainViewController.num_students = names.count
         mainViewController.groupName = groupName
         mainViewController.modeSwitch = modeSwitch
 //        mainViewController.sort = sort
         navigationController?.pushViewController(mainViewController, animated: true)
     }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return names.count
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+        cell.textLabel?.text = names[indexPath.row]
+        cell.backgroundColor = UIColor(red: 255/255, green: 233/255, blue: 156/255, alpha: 1)
+        cell.textLabel?.textColor = .black
+        cell.textLabel?.font = UIFont(name: "ArialMT", size: 15)
+        return cell
+    }
+    
 }

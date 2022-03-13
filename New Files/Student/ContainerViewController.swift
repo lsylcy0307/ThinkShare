@@ -22,6 +22,7 @@ class ContainerViewController: UIViewController {
     var navVC:UINavigationController?
     
     lazy var profileVC = ProfileViewController()
+    lazy var infoVC = InfoViewController()
     lazy var registerVC = RegisterSettingViewController()
     lazy var HomeVC = ViewRegisteredViewController()
     lazy var HistoryVC = HistoryViewController()
@@ -58,6 +59,7 @@ class ContainerViewController: UIViewController {
 extension ContainerViewController: HomeViewControllerDelegate {
 
     func didTapMenuButton() {
+        print("menu")
         toggleMenu(completion: nil)
     }
     
@@ -104,6 +106,17 @@ extension ContainerViewController: menuViewControllerDelegate {
         }
     }
     
+    func addInfo(){
+        let vc = infoVC
+        self.removeVC()
+        HomeVC.addChild(vc)
+        HomeVC.view.addSubview(vc.view)
+        VCTagQueue.append(vc.view.tag)
+        vc.view.frame = view.frame
+        vc.didMove(toParent: self)
+        HomeVC.title = vc.title
+    }
+    
     
     func addRegister(){
         let vc = registerVC
@@ -129,6 +142,7 @@ extension ContainerViewController: menuViewControllerDelegate {
     
     func addHistory(){
         let vc = HistoryVC
+//        vc.sort = "s"
         self.removeVC()
         HomeVC.addChild(vc)
         HomeVC.view.addSubview(vc.view)
@@ -151,7 +165,7 @@ extension ContainerViewController: menuViewControllerDelegate {
                 registerVC.view.removeFromSuperview()
                 registerVC.didMove(toParent: nil)
             }
-            else if VCTagQueue.last == 3 {
+            else if VCTagQueue.last == 8 {
                 HistoryVC.view.removeFromSuperview()
                 HistoryVC.didMove(toParent: nil)
             }

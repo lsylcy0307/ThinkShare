@@ -125,7 +125,7 @@ class createClassViewController: UIViewController, nameViewDelegate {
     
     @objc func nextButtonTapped(){
         //add to the database
-        var data:[String] = []
+        var data:[String] = ["Teacher"] //default name with Teacher
         for eachStackView in self.taskStackView.arrangedSubviews {
             if let nameview = eachStackView as? nameView
             {
@@ -140,7 +140,7 @@ class createClassViewController: UIViewController, nameViewDelegate {
             guard let className = classNameInput.text else {
                 return
             }
-            DatabaseManager.shared.addClassroom(with: data, className: className,completion: {success in
+            DatabaseManager.shared.addClassroom(with: data, className: className, names:data, completion: {success in
                 if success {
                     print("successfully added the discussion setting")
                     self.backToMain()

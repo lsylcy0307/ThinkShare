@@ -84,6 +84,7 @@ class CreateDiscussionViewController: UIViewController, TaskViewDelegate {
         constraint1.isActive = true
         self.taskStackView.addArrangedSubview(view)
         self.view.layoutIfNeeded()
+        self.navigationItem.leftBarButtonItem?.isEnabled = false
     }
     
     @objc func nextButtonTapped(){
@@ -157,5 +158,6 @@ class CreateDiscussionViewController: UIViewController, TaskViewDelegate {
                 self.view.layoutIfNeeded()
             }
         }
+        self.navigationItem.leftBarButtonItem?.isEnabled = true
     }
 }

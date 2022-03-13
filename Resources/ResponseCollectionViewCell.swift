@@ -44,7 +44,7 @@ class ResponseCollectionViewCell: UICollectionViewCell {
     override func layoutSubviews() {
         super.layoutSubviews()
         typeLabel.frame = CGRect(x: 10, y: 10, width: contentView.frame.width, height: 20)
-        CountLabel.frame = CGRect(x: 10, y: contentView.frame.height - 60, width: 30, height: 54)
+        CountLabel.frame = CGRect(x: 10, y: contentView.frame.height - 60, width: 60 , height: 54)
         timeLabel.frame = CGRect(x: CountLabel.right + 10, y: CountLabel.bottom - 10, width: 30, height: 15)
     }
     

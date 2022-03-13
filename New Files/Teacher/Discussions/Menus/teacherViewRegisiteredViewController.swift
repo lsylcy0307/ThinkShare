@@ -147,6 +147,7 @@ extension teacherViewRegisiteredViewController: UITableViewDelegate, UITableView
         let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
         let discussionVC = storyBoard.instantiateViewController(withIdentifier: "createView") as! createGroupViewController
         discussionVC.setting = selectedModel
+        discussionVC.names = classInfo!.students
 //        discussionVC.sort = "t"
         discussionVC.classroomCode = classInfo!.code
         discussionVC.title = selectedModel.code
