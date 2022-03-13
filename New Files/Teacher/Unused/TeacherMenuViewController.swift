@@ -60,6 +60,22 @@ class TeacherMenuViewController: UIViewController {
                               for: .touchUpInside)
         return button
     }()
+    
+    private let classButton: UIButton = {
+        let button = UIButton()
+        button.backgroundColor = UIColor(red: 238/255, green: 168/255, blue: 73/255, alpha: 1)
+        button.setTitle("Class", for: .normal)
+//        button.setBackgroundImage(UIImage(named: "buttonColor2"), for: .normal)
+        button.layer.cornerRadius = 12
+        button.contentEdgeInsets = UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 0);
+        button.contentHorizontalAlignment = .left
+        button.titleLabel?.lineBreakMode = NSLineBreakMode.byWordWrapping
+        button.setTitleColor(.white, for: .normal)
+        button.titleLabel?.font = UIFont(name: "HiraginoSans-W6", size: 30)
+        button.addTarget(self, action: #selector(classButtonTapped),
+                              for: .touchUpInside)
+        return button
+    }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -88,6 +104,10 @@ class TeacherMenuViewController: UIViewController {
                                      y: listButton.bottom+10,
                                  width: size,
                                  height: backgroundView.height*(1/5))
+        classButton.frame = CGRect(x: (backgroundView.frame.size.width-size)/2,
+                                     y: profileButton.bottom+10,
+                                 width: size,
+                                 height: backgroundView.height*(1/5))
         
         baseImage.frame = CGRect(x: 0, y: 0, width: backgroundView.frame.size.width, height: backgroundView.frame.size.height)
         
@@ -95,6 +115,7 @@ class TeacherMenuViewController: UIViewController {
         backgroundView.addSubview(createButton)
         backgroundView.addSubview(listButton)
         backgroundView.addSubview(profileButton)
+        backgroundView.addSubview(classButton)
     }
     
     @objc private func createButtonTapped() {
@@ -110,6 +131,14 @@ class TeacherMenuViewController: UIViewController {
         nav.modalPresentationStyle = .fullScreen
         present(nav, animated: false)
     }
+    
+    @objc private func classButtonTapped(){
+        let vc = classListViewController()
+        let nav = UINavigationController(rootViewController: vc)
+        nav.modalPresentationStyle = .fullScreen
+        present(nav, animated: false)
+    }
+    
     
     @objc private func profileButtonTapped() {
         let vc = ProfileViewController()

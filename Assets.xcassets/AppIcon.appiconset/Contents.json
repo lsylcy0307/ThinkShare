@@ -71,12 +71,13 @@
       "size" : "40x40"
     },
     {
+      "filename" : "ThinkshareLogo_1_76x76.png",
       "idiom" : "ipad",
       "scale" : "1x",
       "size" : "76x76"
     },
     {
-      "filename" : "thinkshare-logo__152x152.png",
+      "filename" : "ThinkshareLogo_152x152.png",
       "idiom" : "ipad",
       "scale" : "2x",
       "size" : "76x76"

@@ -5,6 +5,8 @@ import JGProgressHUD
 
 class createGroupViewController: UIViewController, NamesViewDelegate {
     
+    public var sort = ""
+    public var classroomCode = ""
     private let spinner = JGProgressHUD(style: .dark)
     var student_names = [String]()
     
@@ -117,8 +119,17 @@ class createGroupViewController: UIViewController, NamesViewDelegate {
         guard let window = UIApplication.shared.windows.first(where: { $0.isKeyWindow }) else {
             return
         }
-        window.rootViewController = ContainerViewController()
+        window.rootViewController = TeacherContainerViewController()
         window.makeKeyAndVisible()
+        
+//        if(sort == "s"){
+//            window.rootViewController = ContainerViewController()
+//            window.makeKeyAndVisible()
+//        }
+//        else if(sort == "t"){
+//            window.rootViewController = TeacherContainerViewController()
+//            window.makeKeyAndVisible()
+//        }
     }
     
     @IBAction func switchMode(_ sender: UISwitch) {
@@ -185,11 +196,13 @@ class createGroupViewController: UIViewController, NamesViewDelegate {
         let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
         let mainViewController = storyBoard.instantiateViewController(withIdentifier: "ParticipantsView") as! ParticipantsViewController
         mainViewController.participant = count
+        mainViewController.classroomCode = classroomCode
         mainViewController.partNames = names
         mainViewController.setting = setting
         mainViewController.num_students = count
         mainViewController.groupName = groupName
         mainViewController.modeSwitch = modeSwitch
+//        mainViewController.sort = sort
         navigationController?.pushViewController(mainViewController, animated: true)
     }
 }

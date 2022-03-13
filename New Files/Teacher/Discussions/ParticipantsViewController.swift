@@ -2,6 +2,8 @@ import UIKit
  
 class ParticipantsViewController: UIViewController{
     
+//    public var sort = ""
+    public var classroomCode = ""
     private var discussion_id = ""
     //tableSettings
     
@@ -219,11 +221,12 @@ class ParticipantsViewController: UIViewController{
         print("continue tapped")
         guard let registeredSetting = setting else {return}
         
-        DatabaseManager.shared.createNewDiscussionGroup(with: registeredSetting.code, teacherName: registeredSetting.teacherName, teacherEmail: registeredSetting.teacherEmail, num_students: num_students, groupName: groupName, tableSetting: disucssionTable, nameSetting:nameSetting, completion: { [weak self] result in
+        DatabaseManager.shared.createNewDiscussionGroup(with: registeredSetting.code, teacherName: registeredSetting.teacherName, teacherEmail: registeredSetting.teacherEmail, num_students: num_students, groupName: groupName, tableSetting: disucssionTable, nameSetting:nameSetting, classCode: classroomCode , completion: { [weak self] result in
             switch result {
             case .success(let discussionId):
                 self?.discussion_id = discussionId
                 self?.changeVC()
+                print(discussionId)
             case .failure(let error):
                 print("Failed to get the discussion id: \(error)")
             }
@@ -239,6 +242,7 @@ class ParticipantsViewController: UIViewController{
         mainViewController.setting = setting
         mainViewController.tableSetting = disucssionTable
         mainViewController.names = nameSetting
+//        mainViewController.sort = sort
         mainViewController.discussionId = discussion_id
         mainViewController.modeSwitch = modeSwitch
         navigationController?.pushViewController(mainViewController, animated: true)

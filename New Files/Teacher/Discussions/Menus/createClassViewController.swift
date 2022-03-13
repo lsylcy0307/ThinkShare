@@ -1,32 +1,54 @@
+//
+//  createClassViewController.swift
+//  ThinkShare
+//
+//  Created by Su Yeon Lee on 2022/02/15.
+//
 
 import UIKit
 
-struct discussionSetting {
-    let textName : String
-    let textLink : String
-    let questions : [String]
-}
-
-struct Setting {
-    let code: String
-    let textSettings: [discussionSetting]
-    let registeredDate: String
-}
-
-class CreateDiscussionViewController: UIViewController, TaskViewDelegate {
+class createClassViewController: UIViewController, nameViewDelegate {
+    
+    var classNamelabel:UILabel={
+        let label = UILabel()
+        label.text = "class name"
+        label.font = UIFont(name: "ArialMT", size: 15)
+        return label
+    }()
+    
+    var classNameInput:UITextField={
+        let textField = UITextField()
+//        field.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 5, height: 0))
+        
+        textField.font = UIFont(name: "ArialMT", size: 15)
+        textField.layer.borderWidth = 1
+        textField.layer.borderColor = UIColor.lightGray.cgColor
+        textField.layer.cornerRadius = 10
+        textField.leftViewMode = .always
+        textField.backgroundColor = .secondarySystemBackground
+        
+        textField.backgroundColor = UIColor.white
+        return textField
+    }()
+    
+    lazy var classInputStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .horizontal
+        stackView.alignment = .fill
+        stackView.addArrangedSubview(self.classNamelabel)
+        stackView.addArrangedSubview(self.classNameInput)
+        stackView.distribution  = .fillEqually
+        let constraint = stackView.heightAnchor.constraint(equalToConstant: 30)
+        constraint.isActive = true
+        constraint.priority = UILayoutPriority(rawValue: 999)
+        return stackView
+    }()
+    
     lazy var scrollView: UIScrollView = {
         let scrollView = UIScrollView()
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         return scrollView
     }()
-    
-    public static let dateFormatter: DateFormatter = {
-            let formattre = DateFormatter()
-            formattre.dateStyle = .medium
-            formattre.timeStyle = .long
-            formattre.locale = .current
-            return formattre
-        }()
     
     lazy var taskStackView: UIStackView = {
         let stackView = UIStackView()
@@ -38,7 +60,6 @@ class CreateDiscussionViewController: UIViewController, TaskViewDelegate {
         return stackView
     }()
     
-    
     private var count = 0
     
     init() {
@@ -49,15 +70,17 @@ class CreateDiscussionViewController: UIViewController, TaskViewDelegate {
         fatalError("init(coder:) has not been implemented")
     }
     
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.title = "Discussion Settings"
+        
+        self.title = "New Class"
         self.view.backgroundColor = .white
         addLeftBarButton()
         addRightBarButton()
-        
         view.addSubview(scrollView)
         scrollView.addSubview(taskStackView)
+        view.addSubview(classInputStackView)
         scrollView.snp.makeConstraints { (make) in
             make.edges.equalTo(self.view)
         }
@@ -66,7 +89,21 @@ class CreateDiscussionViewController: UIViewController, TaskViewDelegate {
             make.edges.equalToSuperview()
             make.width.equalTo(scrollView)
         }
+        
     }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        classInputStackView.frame = CGRect(x: 50,
+                                           y: 70,
+                                           width: 300,
+                                           height: 30)
+        scrollView.frame = CGRect(x: 0,
+                                  y: classInputStackView.bottom+10,
+                                  width: view.width,
+                                  height: view.height-40)
+    }
+    
     private func addLeftBarButton() {
         self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "+", style: .done, target: self, action: #selector(addMoreView))
     }
@@ -78,41 +115,32 @@ class CreateDiscussionViewController: UIViewController, TaskViewDelegate {
     @objc
     func addMoreView() {
         count += 1
-        let view = TaskView(delegate: self)
+        let view = nameView(delegate: self)
         let constraint1 = view.heightAnchor.constraint(lessThanOrEqualToConstant: 400.0)
         constraint1.isActive = true
         self.taskStackView.addArrangedSubview(view)
         self.view.layoutIfNeeded()
     }
     
+    
     @objc func nextButtonTapped(){
         //add to the database
-        var data = [discussionSetting]()
+        var data:[String] = []
         for eachStackView in self.taskStackView.arrangedSubviews {
-            if let taskview = eachStackView as? TaskView
+            if let nameview = eachStackView as? nameView
             {
-                guard let textName = taskview.textNameInput.text,
-                      let textLink = taskview.textLinkInput.text else {
+                guard let textName = nameview.studentNameInput.text else {
                     return
                 }
                 
-                var questions:[String] = []
-                for eachInputView in taskview.inputStackView.arrangedSubviews {
-                    if let inputview = eachInputView as? InputView
-                    {
-                        guard let question = inputview.textInput.text else {
-                            return
-                        }
-                        questions.append(question)
-                    }
-                }
-                let dataPoint = discussionSetting(textName: textName, textLink: textLink, questions: questions)
-                
-                data.append(dataPoint)
+                data.append(textName)
             }
         }
         if(data.isEmpty != true){
-            DatabaseManager.shared.addDiscussionSetting(with: data, completion: {success in
+            guard let className = classNameInput.text else {
+                return
+            }
+            DatabaseManager.shared.addClassroom(with: data, className: className,completion: {success in
                 if success {
                     print("successfully added the discussion setting")
                     self.backToMain()
@@ -124,18 +152,13 @@ class CreateDiscussionViewController: UIViewController, TaskViewDelegate {
         }
     }
     
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        scrollView.frame = view.bounds
-    }
-    
     
     private func backToMain(){
         print("dismiss")
         self.navigationController?.dismiss(animated: true, completion: nil)
     }
     
-    func onRemove(_ view: TaskView) {
+    func onRemove(_ view: nameView) {
         count -= 1
         if let first = self.taskStackView.arrangedSubviews.first(where: { $0 === view }) {
             UIView.animate(withDuration: 0.3, animations: {
@@ -146,4 +169,5 @@ class CreateDiscussionViewController: UIViewController, TaskViewDelegate {
             }
         }
     }
+
 }

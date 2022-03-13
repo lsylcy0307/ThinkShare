@@ -16,6 +16,8 @@ struct questionSet {
 
 class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
     
+//    public var sort = ""
+    
     public var setting:registeredSetting?
     private let spinner = JGProgressHUD(style: .dark)
     public var discussionId = ""
@@ -45,7 +47,7 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
     
     var firstqStart = 0
     var response_type = [String]()
-    var responsetypes = ["agreement", "change", "elaboration", "disagreement"]
+    var responsetypes = ["agreement", "change", "elaboration", "disagreement", "question", "teacher"]
     var prev_type_response = ""
         
     var prev_lineType = ""
@@ -146,6 +148,8 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
     @IBOutlet weak var changeBtn: UIButton!
     @IBOutlet weak var expandingBtn: UIButton!
     @IBOutlet weak var disagreementBtn: UIButton!
+    @IBOutlet weak var questionBtn: UIButton!
+    @IBOutlet weak var teacherBtn: UIButton!
     
     private var questionStart = 0
     private var questionEnd = 0
@@ -163,7 +167,7 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
     var partNames = [UILabel]()
     var tableNames = [String]()
     
-    var responseTypeCnt: [Int] = [0,0,0,0]
+    var responseTypeCnt: [Int] = [0,0,0,0,0,0]
     var speakingTime:[Int] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
     var frequencySpeak:[Int] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
     
@@ -235,22 +239,30 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
             changeBtn.isEnabled = false
             expandingBtn.isEnabled = false
             disagreementBtn.isEnabled = false
+            teacherBtn.isEnabled = false
+            questionBtn.isEnabled = false
             
             agreementBtn.isHidden = true
             changeBtn.isHidden = true
             expandingBtn.isHidden = true
             disagreementBtn.isHidden = true
+            teacherBtn.isHidden = true
+            questionBtn.isHidden = true
         }
         else {
             agreementBtn.isEnabled = true
             changeBtn.isEnabled = true
             expandingBtn.isEnabled = true
             disagreementBtn.isEnabled = true
+            teacherBtn.isEnabled = true
+            questionBtn.isEnabled = true
             
             agreementBtn.isHidden = false
             changeBtn.isHidden = false
             expandingBtn.isHidden = false
             disagreementBtn.isHidden = false
+            teacherBtn.isHidden = false
+            questionBtn.isHidden = false
         }
         
         currentPoint = table.center
@@ -272,6 +284,13 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
         changeBtn.layer.borderColor = CGColor(red: 0/255, green: 161/255, blue: 241/255, alpha: 1)
         changeBtn.layer.borderWidth = 5
         
+        questionBtn.layer.cornerRadius = 15
+        questionBtn.layer.borderColor = CGColor(red: 255/255, green: 147/255, blue: 0/255, alpha: 1)
+        questionBtn.layer.borderWidth = 5
+        
+        teacherBtn.layer.cornerRadius = 15
+        teacherBtn.layer.borderColor = CGColor(red: 148/255, green: 55/255, blue: 255/255, alpha: 1)
+        teacherBtn.layer.borderWidth = 5
     }
     
     func getDirectory() -> URL {
@@ -564,6 +583,14 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
             selectedRespBtn = disagreementBtn
             type = 4
             responseTypeCnt[3] += 1
+        case 5:
+            selectedRespBtn = questionBtn
+            type = 5
+            responseTypeCnt[4] += 1
+        case 6:
+            selectedRespBtn = teacherBtn
+            type = 6
+            responseTypeCnt[5] += 1
         default:
             print("default btn")
             
@@ -734,8 +761,14 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
             else if(type == 4){
                 line.strokeColor = UIColor(red: 255/255, green: 0/255, blue: 0/255, alpha: 0.3).cgColor
             }
+            else if(type == 5){
+                line.strokeColor = UIColor(red: 255/255, green: 147/255, blue: 0/255, alpha: 1).cgColor
+            }
+            else if(type == 6){
+                line.strokeColor = UIColor(red: 148/255, green: 55/255, blue: 255/255, alpha: 0.3).cgColor
+            }
             else{
-                line.strokeColor = UIColor(red: 255/255, green: 255/255, blue: 255/255, alpha: 0.3).cgColor
+                line.strokeColor = UIColor(red: 148/255, green: 55/255, blue: 255/255, alpha: 1).cgColor
             }
         }
         
@@ -750,14 +783,16 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
     
     private func addToFlow(person:String,startTime: Int, endTime: Int, duration: Int, responseType:[String], responseAList:[String],responseBList:[String]){
         
-        DatabaseManager.shared.recordDiscussionFlow(with: discussionId, selectedPerson: person, startTime: startTime, endTime: endTime, duration: duration, responseType: responseType, responseAList: responseAList, responseBList: responseBList, completion: {success in
-            if(success){
-                print("recorded")
-            }
-            else{
-                print("error recording")
-            }
-        })
+        if (responseType.isEmpty != true){
+            DatabaseManager.shared.recordDiscussionFlow(with: discussionId, selectedPerson: person, startTime: startTime, endTime: endTime, duration: duration, responseType: responseType, responseAList: responseAList, responseBList: responseBList, completion: {success in
+                if(success){
+                    print("recorded")
+                }
+                else{
+                    print("error recording")
+                }
+            })
+        }
     }
     
   
@@ -835,13 +870,15 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
 
     
     func discussionEnded(){
+        
+//        if !(btnQueue.last?.backgroundColor == .none){
+//            print("the last person was not recorded")
+//            self.addToFlow(person: partNames[index].text!, startTime: startTime, endTime: endTime, duration: duration, responseType:response_type, responseAList:responseList, responseBList:responseBList)
+//        }
+        
         usedQuestions.append(questionSet(question: currentQuestion, duration: questionStart-count))
         
         finishedTime = count
-        
-//        addRegistered()
-//        let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
-//        let resultVC = storyBoard.instantiateViewController(withIdentifier: "resultView") as! ResultViewController
         
         let resultVC = ResultViewController()
         
@@ -855,6 +892,7 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
         resultVC.responseTypeCnt = self.responseTypeCnt
         resultVC.numParticipants = self.numParticipants
         resultVC.lineCnt = self.lineCnt
+        resultVC.sort = self.sort
         
         if isRecording {
             soundRecorder.stop()
@@ -912,6 +950,8 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
         disagreementBtn.isEnabled = true
         expandingBtn.isEnabled = true
         changeBtn.isEnabled = true
+        teacherBtn.isEnabled = true
+        questionBtn.isEnabled = true
     }
     
     func showAlert(){

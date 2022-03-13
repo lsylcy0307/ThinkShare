@@ -17,9 +17,11 @@ class TeacherMenusViewController:  UIViewController, UITableViewDelegate, UITabl
     
     enum MenuOptions: String, CaseIterable {
         case home = "Home"
-//        case register = "Create"
         case profile = "Profile"
         case info = "Information"
+        case classroom = "classroom"
+        case classList = "class list"
+        
         
         var imageName: String{
             switch self {
@@ -29,8 +31,10 @@ class TeacherMenusViewController:  UIViewController, UITableViewDelegate, UITabl
                 return "person"
             case .info:
                 return "gear"
-//            case .register:
-//                return "airplane"
+            case .classroom:
+                return "gear"
+            case .classList:
+                return "gear"
             }
         }
     }
@@ -75,6 +79,7 @@ class TeacherMenusViewController:  UIViewController, UITableViewDelegate, UITabl
         tableView.deselectRow(at: indexPath, animated: true)
         let item = MenuOptions.allCases[indexPath.row]
         delegate?.didSelect(menuItem: item)
+//        pagedelegate?.load(at: "title")
     }
 
 }

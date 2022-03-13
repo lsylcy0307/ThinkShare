@@ -5,8 +5,23 @@ protocol TaskViewDelegate {
     func onRemove(_ view: TaskView)
 }
 
-class TaskView: UIView, InputViewDelegate {
-    func onRemove(_ view: InputView) {
+class TaskView: UIView, InputViewDelegate, CriteriaViewDelegate {
+//    func onCriteriaRemove(_ view: CriteriaView) {
+//        <#code#>
+//    }
+//    
+    func onInputRemove(_ view: CriteriaView) {
+        if let first = self.stackView.arrangedSubviews.first(where: { $0 === view }) {
+            UIView.animate(withDuration: 0.3, animations: {
+                first.isHidden = true
+                first.removeFromSuperview()
+            }) { (_) in
+                self.stackView.layoutIfNeeded()
+            }
+        }
+    }
+    
+    func onCriteriaRemove(_ view: CriteriaView) {
         if let first = self.stackView.arrangedSubviews.first(where: { $0 === view }) {
             UIView.animate(withDuration: 0.3, animations: {
                 first.isHidden = true
@@ -29,11 +44,22 @@ class TaskView: UIView, InputViewDelegate {
         stackView.addArrangedSubview(self.nameInputStackView)
         stackView.addArrangedSubview(self.linkInputStackView)
         stackView.addArrangedSubview(self.inputStackView)
+        stackView.addArrangedSubview(self.criteriaStackView)
         stackView.translatesAutoresizingMaskIntoConstraints = false
         return stackView
     }()
     
     lazy var inputStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.spacing = 10.0
+        stackView.alignment = .fill
+        stackView.distribution = .fill
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        return stackView
+    }()
+    
+    lazy var criteriaStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
         stackView.spacing = 10.0
@@ -103,6 +129,7 @@ class TaskView: UIView, InputViewDelegate {
         stackView.addArrangedSubview(Titlelabel)
         stackView.addArrangedSubview(btnShow)
         stackView.addArrangedSubview(addButton)
+        stackView.addArrangedSubview(addCriteriaButton)
         let constraint = stackView.heightAnchor.constraint(equalToConstant: 30)
         constraint.isActive = true
         constraint.priority = UILayoutPriority(rawValue: 999)
@@ -143,6 +170,14 @@ class TaskView: UIView, InputViewDelegate {
         return button
     }()
     
+    lazy var addCriteriaButton: UIButton  = {
+        let button = UIButton()
+        button.setTitle("+", for: .normal)
+        button.setTitleColor(UIColor(cgColor: CGColor(red: 0/255, green: 0/255, blue: 255/255, alpha: 1)), for: .normal)
+        button.addTarget(self, action: #selector(addMoreCriteriaField), for: .touchUpInside)
+        return button
+    }()
+    
     lazy var btnShow: UIButton = {
         let btn = UIButton()
         btn.setTitle("Hide", for: .normal)
@@ -177,6 +212,7 @@ class TaskView: UIView, InputViewDelegate {
             self.nameInputStackView.isHidden = !self.nameInputStackView.isHidden
             self.linkInputStackView.isHidden = !self.linkInputStackView.isHidden
             self.inputStackView.isHidden = !self.inputStackView.isHidden
+            self.criteriaStackView.isHidden = !self.criteriaStackView.isHidden
         }
         
         if self.nameInputStackView.isHidden {
@@ -192,6 +228,15 @@ class TaskView: UIView, InputViewDelegate {
         constraint1.isActive = true
         self.inputStackView.addArrangedSubview(view)
         self.inputStackView.layoutIfNeeded()
+        self.stackView.layoutIfNeeded()
+    }
+    
+    @objc func addMoreCriteriaField(){
+        let view = CriteriaView(delegate: self)
+        let constraint1 = view.heightAnchor.constraint(lessThanOrEqualToConstant: 400.0)
+        constraint1.isActive = true
+        self.criteriaStackView.addArrangedSubview(view)
+        self.criteriaStackView.layoutIfNeeded()
         self.stackView.layoutIfNeeded()
     }
     

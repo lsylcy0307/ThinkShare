@@ -13,6 +13,8 @@ struct flow {
 
 class ResultViewController: UIViewController, ChartViewDelegate, UITableViewDelegate, UITableViewDataSource,AVAudioPlayerDelegate, AVAudioRecorderDelegate, UICollectionViewDelegate, UICollectionViewDataSource{
     
+//    public var sort = ""
+    
     var soundPlayer : AVAudioPlayer!
     var discussionFlows = [flow]()
     public var lineCnt = 0
@@ -43,7 +45,7 @@ class ResultViewController: UIViewController, ChartViewDelegate, UITableViewDele
     var nonZeroSpeakTime = [Int]()
     var numParticipants = 0
     var filename = ""
-    let responseTypes = ["Agreement", "Change", "Expanding", "Disagreement"]
+    let responseTypes = ["Agreement", "Evidence", "Expanding", "Disagreement", "Question", "Teacher"]
     
     var collectionView: UICollectionView?
     let tableView = UITableView()
@@ -526,15 +528,14 @@ class ResultViewController: UIViewController, ChartViewDelegate, UITableViewDele
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 4
+        return 6
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ResponseCollectionViewCell.identifier, for: indexPath) as! ResponseCollectionViewCell
-        let color: [UIColor] = [.green, .yellow, .orange, .red]
+        let color: [UIColor] = [.green, .blue, .yellow, .red, .orange, .purple]
         cell.configure(type: responseTypes[indexPath.row], count: responseTypeCnt[indexPath.row], color: color[indexPath.row])
         print(responseTypeCnt[indexPath.row])
-//        cell.contentView.backgroundColor = .systemBlue
         return cell
     }
 }

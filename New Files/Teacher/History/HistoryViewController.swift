@@ -38,7 +38,9 @@ import UIKit
 import JGProgressHUD
 
 class HistoryViewController: UIViewController {
-    
+    weak var popDelegate:popClassVCDelegate?
+    public var sort=""
+    public var classInfo:classrooms?
     var discussionId = ""
     var discussionFlows = [flow]()
     var discussionSetup: Setup?
@@ -55,8 +57,19 @@ class HistoryViewController: UIViewController {
     var tableNames = [String]()
     
     private let spinner = JGProgressHUD(style: .dark)
-    
+    public var identity = ""
     private var discussions = [discussionHistory]()
+    
+    private let backButton: UIButton = {
+        let button = UIButton()
+        button.setTitle("Back", for: .normal)
+        button.backgroundColor = UIColor(cgColor: CGColor(red: 87/255, green: 149/255, blue: 149/255, alpha: 1))
+        button.setTitleColor(.white, for: .normal)
+        button.layer.masksToBounds = true
+        button.layer.cornerRadius = 20
+        button.titleLabel?.font = UIFont(name: "NotoSansKannada-Bold", size: 20)
+        return button
+    }()
     
     private let tableView: UITableView = {
         let table = UITableView()
@@ -79,14 +92,49 @@ class HistoryViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        backButton.addTarget(self,
+                             action: #selector(didTapBack),
+                             for: .touchUpInside)
+        
         title = "History"
         view.backgroundColor = .white
-        view.tag = 3
+        view.tag = 8
         view.addSubview(tableView)
         view.addSubview(noSettingsLabel)
-        setupTableView()
-        getHistory()
+//        guard let identity = UserDefaults.standard.value(forKey: "identity") as? String else {
+//            return
+//       }
+//        if (identity == "Teacher"){
+//            print(identity)
+//            self.identity = "Teacher"
+//            view.addSubview(backButton)
+//        }
+//        else{
+//            self.identity = "Students"
+//        }
     }
+    
+    
+    @objc private func didTapBack(){
+        popDelegate?.onPopView()
+    }
+    
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        DispatchQueue.main.async {
+            self.setupTableView()
+            self.getHistory()
+        }
+//        if(sort == "t"){
+//            DispatchQueue.main.async {
+//                self.setupTableView()
+//                self.getHistory()
+//            }
+//        }
+    }
+    
     private func setupTableView() {
         tableView.delegate = self
         tableView.dataSource = self
@@ -97,13 +145,10 @@ class HistoryViewController: UIViewController {
             return
         }
         let safeEmail = DatabaseManager.safeEmail(emailAddress: email)
-
-        DatabaseManager.shared.getAllDiscussionHistory(for: safeEmail, completion: { [weak self] result in
+        print(sort)
+        DatabaseManager.shared.getAllDiscussionHistory(for: safeEmail, classroomCode: classInfo?.code,completion: { [weak self] result in
             switch result {
             case .success(let histories):
-                
-                
-                
                 guard !histories.isEmpty else {
                     self?.tableView.isHidden = true
                     self?.noSettingsLabel.isHidden = false
@@ -113,7 +158,6 @@ class HistoryViewController: UIViewController {
                 self?.noSettingsLabel.isHidden = true
                 self?.tableView.isHidden = false
                 self?.discussions = histories
-//                print(histories)
                 DispatchQueue.main.async {
                     self?.tableView.reloadData()
                 }
@@ -127,7 +171,17 @@ class HistoryViewController: UIViewController {
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        tableView.frame = view.bounds
+        backButton.frame = CGRect(x: 20,
+                                  y: 80,
+                                  width: 200,
+                                  height: 50)
+//        if(self.identity == "Teacher"){
+//            backButton.frame = CGRect(x: 20,
+//                                      y: 80,
+//                                      width: 200,
+//                                      height: 50)
+//        }
+        tableView.frame = CGRect(x: 0, y: 150, width: view.width, height: view.height-150)
         noSettingsLabel.frame = CGRect(x: 10,
                                           y: (view.height-100)/2,
                                           width: view.width-20,
@@ -175,23 +229,23 @@ extension HistoryViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            //begin delete
-            let discussionId = discussions[indexPath.row].code
-            print("tring to delete: \(discussionId)")
-            tableView.beginUpdates()
-            
-            DatabaseManager.shared.deleteDiscussionHistory(discussionId: discussionId, completion: { [weak self] success in
-                if success {
-                    print("success")
-                    self?.discussions.remove(at: indexPath.row)
-                    tableView.deleteRows(at: [indexPath], with: .left)
-                }
-            })
-            tableView.endUpdates()
-            
+            if editingStyle == .delete {
+                // begin delete
+                let discussionId = discussions[indexPath.row].code
+                print("tring to delete: \(discussionId)")
+                tableView.beginUpdates()
+                self.discussions.remove(at: indexPath.row)
+                tableView.deleteRows(at: [indexPath], with: .left)
+
+                DatabaseManager.shared.deleteDiscussionHistory(discussionId: discussionId, completion: { success in
+                    if !success {
+                        // add  model and row back and show error alert
+                    }
+                })
+
+                tableView.endUpdates()
+            }
         }
-    }
     
     private func loadDiscussionSetting(){
         guard let email = UserDefaults.standard.value(forKey: "email") as? String else {
@@ -199,14 +253,14 @@ extension HistoryViewController: UITableViewDelegate, UITableViewDataSource {
         }
         let safeEmail = DatabaseManager.safeEmail(emailAddress: email)
     
-        DatabaseManager.shared.getDiscussionSettings(with: safeEmail, discussionID: discussionId, completion: { [weak self] result in
+        DatabaseManager.shared.getDiscussionSettings(with: safeEmail, sort: sort, classroomCode: classInfo!.code, discussionID: discussionId, completion: { [weak self] result in
             switch result {
             case .success(let setup):
                 self?.discussionSetup = setup
                 self?.getDiscussionFlow()
                 self?.getDiscussionResult()
             case .failure(let error):
-                print("failed to get flows: \(error)")
+                print("failed to get settings: \(error)")
             }
         })
     }
@@ -229,7 +283,7 @@ extension HistoryViewController: UITableViewDelegate, UITableViewDataSource {
                 self?.discussionResult = result
                 self?.interpretFlow()
             case .failure(let error):
-                print("failed to get flows: \(error)")
+                print("failed to get result: \(error)")
             }
         })
         
