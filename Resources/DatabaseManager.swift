@@ -382,7 +382,7 @@ extension DatabaseManager{
                 for setting in data {
                     let newSettingData: [String:Any] =
                     ["textName":setting.textName,
-                     "textLink":setting.textLink,
+                     "textLink":"",
                      "questions": setting.questions,
                      "criterias":setting.criteria]
                     discussionSetting.append(newSettingData)
@@ -784,7 +784,7 @@ extension DatabaseManager{
                         completion(false)
                         return
                     }
-                    self?.finishStudentRecord(with: names, classCode: classroomCode, speakFrequency: speakFrequency, speakTime: speakTime, discussionId: discussionId, completion: completion)
+                    self?.finishStudentRecord(with: names, classCode: classroomCode, speakFrequency: speakFrequency, speakTime: speakTime, discussionId: discussionId, duration: initialTime-finishTime, completion: completion)
                 })
             }
             else{
@@ -796,20 +796,19 @@ extension DatabaseManager{
                         completion(false)
                         return
                     }
-                    self?.finishStudentRecord(with: names, classCode: classroomCode, speakFrequency: speakFrequency, speakTime: speakTime, discussionId: discussionId, completion: completion)
+                    self?.finishStudentRecord(with: names, classCode: classroomCode, speakFrequency: speakFrequency, speakTime: speakTime, discussionId: discussionId, duration: initialTime-finishTime, completion: completion)
                 })
             }
             completion(true)
         })
     }
     
-    private func finishStudentRecord(with names:[String], classCode:String, speakFrequency: [Int], speakTime: [Int], discussionId:String, completion:  @escaping (Bool) -> Void){
+    private func finishStudentRecord(with names:[String], classCode:String, speakFrequency: [Int], speakTime: [Int], discussionId:String, duration: Int, completion:  @escaping (Bool) -> Void){
         guard let email = UserDefaults.standard.value(forKey: "email") as? String else{
                 return
         }
         let date = Date()
         let dateString = CreateDiscussionViewController.dateFormatter.string(from: date)
-        
         let safeEmail = DatabaseManager.safeEmail(emailAddress: email)
         
         let ref = database.child("\(safeEmail)/classrooms")
@@ -832,7 +831,7 @@ extension DatabaseManager{
                     for record in records{
                         let name = record["name"]
                         let indexofN = names.firstIndex(of: name as! String)!
-                        let result = ["frequency":speakFrequency[indexofN], "speakTime": speakTime[indexofN],"discussionId": discussionId, "date": dateString] as [String : Any]
+                        let result = ["frequency":speakFrequency[indexofN], "speakTime": speakTime[indexofN],"discussionId": discussionId, "date": dateString, "duration": duration] as [String : Any]
                         
                         if var rec = record["statistic"] as? [[String:Any]]{
                             rec.append(result)
@@ -1059,6 +1058,63 @@ extension DatabaseManager{
         
     }
     
+    public func getStudentRecord(with classCode:String, name:String, completion: @escaping (Result<[participationRecord], Error>) -> Void){
+        
+        guard let email = UserDefaults.standard.value(forKey: "email") as? String else{
+                return
+        }
+        let safeEmail = DatabaseManager.safeEmail(emailAddress: email)
+        
+        database.child("\(safeEmail)/classrooms").observe(.value, with: { snapshot in
+            guard let collection = snapshot.value as? [[String: Any]] else{
+                completion(.failure(DatabaseError.failedToFetch))
+                return
+            }
+            
+            if let setting = collection.first(where: {
+                guard let targetCode = $0["code"] as? String else {
+                    return false
+                }
+                return classCode == targetCode
+            }) {
+                guard let value = setting["student_record"] as? [[String: Any]] else{
+                    completion(.failure(DatabaseError.failedToFetch))
+                    return
+                }
+                if let student = value.first(where: {
+                    guard let targetName = $0["name"] as? String else {
+                        return false
+                    }
+                    return name == targetName
+                }){
+                    guard let value = student["statistic"] as? [[String: Any]] else{
+                        print("does not have a statistic")
+                        completion(.failure(DatabaseError.failedToFetch))
+                        return
+                    }
+                    let record: [participationRecord] = value.compactMap({ dictionary in
+                        guard let date = dictionary["date"] as? String,
+                              let id = dictionary["discussionId"] as? String,
+                              let frequency = dictionary["frequency"] as? Int,
+                              let speakTime = dictionary["speakTime"] as? Int,
+                              let duration = dictionary["duration"] as? Int else {
+                                  print("!")
+                                  return nil
+                              }
+                        
+                        
+                        
+                        
+                        
+                        return participationRecord(date: date, discussionId: id, frequency: frequency, speakTime: speakTime, duration: duration)
+                    })
+                    completion(.success(record))
+                    return
+                }
+            }
+        })
+    }
+                    
     public func getDiscussionResult(with discussionId:String, completion: @escaping (Result<DiscResult, Error>) -> Void){
         
         database.child("\(discussionId)/discussionResult").observe(.value, with: { snapshot in
@@ -1260,32 +1316,37 @@ extension DatabaseManager{
         return timeString
     }
     
-    public func deleteCodeRegistered(discussioncode: String, completion: @escaping (Bool) -> Void) {
-        print("deleting one with code : \(discussioncode)")
+    public func deleteCodeRegistered(discussioncode: String, classCode:String, completion: @escaping (Bool) -> Void) {
+        print("deleting one with code : \(discussioncode) for \(classCode)")
         guard let email = UserDefaults.standard.value(forKey: "email") as? String else{
                 return
         }
         
         let safeEmail = DatabaseManager.safeEmail(emailAddress: email)
-        let ref = database.child("\(safeEmail)/registeredSettings")
+        let ref = database.child("\(safeEmail)/classrooms")
         ref.observeSingleEvent(of: .value) {snapshot in
-            if var codes = snapshot.value as? [[String: Any]] {
-                print(codes)
-                
-                var positionToRemove = 0
-                for code in codes {
-//                    print(code)
-                    if let cur_code = code["code"] as? String,
-                       cur_code == discussioncode {
-                        print("found code to delete")
-                        print(positionToRemove)
+            if var classrooms = snapshot.value as? [[String: Any]] {
+                var cnt = 0
+                for classroom in classrooms{
+                    if (classroom["code"] as! String == classCode){
+                        var settings = classroom["registeredSettings"] as! [[String:Any]]
+                        var positionToRemove = 0
+                        for setting in settings {
+                            if (setting["code"] as! String == discussioncode){
+                                print("found code to delete")
+                                break
+                            }
+                            positionToRemove += 1
+                        }
+                        settings.remove(at: positionToRemove)
+                        classrooms[cnt]["registeredSettings"] = settings
                         break
                     }
-                    positionToRemove += 1
+                    cnt += 1
                 }
-                
-                codes.remove(at: positionToRemove)
-                ref.setValue(codes, withCompletionBlock: {error, _ in
+//                print(classrooms[cnt])
+//                completion(true)
+                ref.setValue(classrooms, withCompletionBlock: {error, _ in
                     guard error == nil else{
                         completion(false)
                         return
@@ -1319,6 +1380,40 @@ extension DatabaseManager{
                 
                 discussions.remove(at: positionToRemove)
                 ref.setValue(discussions, withCompletionBlock: {error, _ in
+                    guard error == nil else{
+                        completion(false)
+                        return
+                    }
+                    print("deleted")
+                    
+                    completion(true)
+                })
+            }
+        }
+    }
+    
+    public func deleteClassroomRegistered(classcode: String, completion: @escaping (Bool) -> Void) {
+        print("deleting one with id : \(classcode)")
+        guard let email = UserDefaults.standard.value(forKey: "email") as? String else{
+                return
+        }
+        
+        let safeEmail = DatabaseManager.safeEmail(emailAddress: email)
+        let ref = database.child("\(safeEmail)/classrooms")
+        ref.observeSingleEvent(of: .value) {snapshot in
+            if var classes = snapshot.value as? [[String: Any]] {
+                var positionToRemove = 0
+                for classroom in classes {
+                    if let id  = classroom["code"] as? String,
+                       id == classcode {
+                        print("found class to delete")
+                        break
+                    }
+                    positionToRemove += 1
+                }
+                
+                classes.remove(at: positionToRemove)
+                ref.setValue(classes, withCompletionBlock: {error, _ in
                     guard error == nil else{
                         completion(false)
                         return

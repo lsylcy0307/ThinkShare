@@ -30,6 +30,18 @@ class classroomsViewController: UIViewController {
         return table
     }()
     
+    private let createButton: UIButton = {
+        let button = UIButton()
+        button.setTitle("Create a classroom", for: .normal)
+        button.backgroundColor = UIColor(cgColor: CGColor(red: 87/255, green: 149/255, blue: 149/255, alpha: 1))
+        button.setTitleColor(.white, for: .normal)
+        button.layer.masksToBounds = true
+        button.layer.cornerRadius = 20
+        button.titleLabel?.font = UIFont(name: "NotoSansKannada-Bold", size: 20)
+        return button
+    }()
+
+    
     private let noSettingsLabel: UILabel = {
         let label = UILabel()
         label.text = "Start a new class!"
@@ -45,14 +57,28 @@ class classroomsViewController: UIViewController {
         title = "classrooms"
         view.backgroundColor = .white
         view.tag = 4
+        
+        createButton.addTarget(self,
+                             action: #selector(didTapCreate),
+                             for: .touchUpInside)
+        
+        view.addSubview(createButton)
         view.addSubview(tableView)
         view.addSubview(noSettingsLabel)
         setupTableView()
         getHistory()
     }
+    
     private func setupTableView() {
         tableView.delegate = self
         tableView.dataSource = self
+    }
+    
+    @objc private func didTapCreate(){
+        let vc = createClassViewController()
+        let navVC = UINavigationController(rootViewController: vc)
+        navVC.modalPresentationStyle = .overFullScreen
+        self.present(navVC, animated: true)
     }
 
     private func getHistory(){
@@ -86,7 +112,11 @@ class classroomsViewController: UIViewController {
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        tableView.frame = view.bounds
+        createButton.frame = CGRect(x: 20,
+                                  y: 80,
+                                  width: 250,
+                                  height: 50)
+        tableView.frame = CGRect(x: 0, y: 150, width: view.width, height: view.height-150)
         noSettingsLabel.frame = CGRect(x: 10,
                                           y: (view.height-100)/2,
                                           width: view.width-20,
@@ -122,5 +152,28 @@ extension classroomsViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat{
         return 90
     }
+    
+    func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
+        return .delete
+    }
+    
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+            if editingStyle == .delete {
+                let classcode = classes[indexPath.row].code
+                print(classcode)
+                tableView.beginUpdates()
+                self.classes.remove(at: indexPath.row)
+                tableView.deleteRows(at: [indexPath], with: .left)
+
+                DatabaseManager.shared.deleteClassroomRegistered(classcode: classcode, completion: { success in
+                    if !success {
+                        // add  model and row back and show error alert
+                    }
+                    print("deleted")
+                })
+
+                tableView.endUpdates()
+            }
+        }
 
 }

@@ -919,7 +919,6 @@ class DiscussionViewController: UIViewController, AVAudioRecorderDelegate {
         resultVC.numParticipants = self.numParticipants
         resultVC.lineCnt = self.lineCnt
         resultVC.send_criterias = self.send_criterias[0]
-//        resultVC.sort = self.sort
         
         if isRecording {
             soundRecorder.stop()

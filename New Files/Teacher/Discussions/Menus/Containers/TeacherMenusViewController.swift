@@ -19,7 +19,6 @@ class TeacherMenusViewController:  UIViewController, UITableViewDelegate, UITabl
         case home = "Home"
         case profile = "Profile"
         case info = "Information"
-        case classroom = "classroom"
         case classList = "class list"
         
         
@@ -30,8 +29,6 @@ class TeacherMenusViewController:  UIViewController, UITableViewDelegate, UITabl
             case .profile:
                 return "person"
             case .info:
-                return "gear"
-            case .classroom:
                 return "gear"
             case .classList:
                 return "gear"

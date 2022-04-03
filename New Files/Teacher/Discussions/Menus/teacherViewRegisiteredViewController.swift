@@ -165,16 +165,17 @@ extension teacherViewRegisiteredViewController: UITableViewDelegate, UITableView
             if editingStyle == .delete {
                 // begin delete
                 let discussioncode = settings[indexPath.row].code
+                print(discussioncode)
                 tableView.beginUpdates()
                 self.settings.remove(at: indexPath.row)
                 tableView.deleteRows(at: [indexPath], with: .left)
 
                 
-//                DatabaseManager.shared.deleteCodeRegistered(discussioncode: discussioncode, completion: { success in
-//                    if !success {
-//                        // add  model and row back and show error alert
-//                    }
-//                })
+                DatabaseManager.shared.deleteCodeRegistered(discussioncode: discussioncode, classCode: classInfo!.code, completion: { success in
+                    if !success {
+                        // add  model and row back and show error alert
+                    }
+                })
 
                 tableView.endUpdates()
             }

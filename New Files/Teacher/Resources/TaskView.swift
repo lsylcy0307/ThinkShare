@@ -9,33 +9,17 @@ class TaskView: UIView, InputViewDelegate, CriteriaViewDelegate {
 //    func onCriteriaRemove(_ view: CriteriaView) {
 //        <#code#>
 //    }
-    var cnt = 0
-    func onInputRemove(_ view: CriteriaView) {
-        if let first = self.stackView.arrangedSubviews.first(where: { $0 === view }) {
-            UIView.animate(withDuration: 0.3, animations: {
-                first.isHidden = true
-                first.removeFromSuperview()
-            }) { (_) in
-                self.stackView.layoutIfNeeded()
-            }
-        }
-    }
-    
-    func onCriteriaRemove(_ view: CriteriaView) {
-        cnt -= 1
-        if let first = self.stackView.arrangedSubviews.first(where: { $0 === view }) {
-            UIView.animate(withDuration: 0.3, animations: {
-                first.isHidden = true
-                first.removeFromSuperview()
-            }) { (_) in
-                self.stackView.layoutIfNeeded()
-            }
-        }
-        if(cnt<6){
-            addCriteriaButton.isEnabled = true
-        }
-    }
-    
+
+//    func onInputRemove(_ view: CriteriaView) {
+//        if let first = self.stackView.arrangedSubviews.first(where: { $0 === view }) {
+//            UIView.animate(withDuration: 0.3, animations: {
+//                first.isHidden = true
+//                first.removeFromSuperview()
+//            }) { (_) in
+//                self.stackView.layoutIfNeeded()
+//            }
+//        }
+//    }
     
     lazy var stackView: UIStackView = {
         let stackView = UIStackView()
@@ -43,6 +27,7 @@ class TaskView: UIView, InputViewDelegate, CriteriaViewDelegate {
         stackView.spacing = 10.0
         stackView.alignment = .fill
         stackView.distribution = .fill
+//        stackView.contentsiz
         stackView.addArrangedSubview(self.horizontalStackView)
         stackView.addArrangedSubview(self.btnRemove)
         stackView.addArrangedSubview(self.nameInputStackView)
@@ -197,7 +182,6 @@ class TaskView: UIView, InputViewDelegate, CriteriaViewDelegate {
     let delegate: TaskViewDelegate
     
     init(delegate: TaskViewDelegate) {
-//        self.data = data
         self.delegate = delegate
         super.init(frame: .zero)
         backgroundColor = UIColor(cgColor: CGColor(red: 255/255, green: 242/255, blue: 198/255, alpha: 1))
@@ -265,4 +249,22 @@ class TaskView: UIView, InputViewDelegate, CriteriaViewDelegate {
             }
         }
     }
+    
+    var cnt = 0
+    func onCriteriaRemove(_ view: CriteriaView) {
+        cnt -= 1
+        if let first = self.criteriaStackView.arrangedSubviews.first(where: { $0 === view }) {
+            UIView.animate(withDuration: 0.3, animations: {
+                first.isHidden = true
+                first.removeFromSuperview()
+            }) { (_) in
+                self.criteriaStackView.layoutIfNeeded()
+            }
+        }
+        if(cnt<6){
+            addCriteriaButton.isEnabled = true
+        }
+    }
+    
+    
 }

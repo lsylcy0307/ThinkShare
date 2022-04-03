@@ -198,9 +198,9 @@ class ResultViewController: UIViewController, ChartViewDelegate, UITableViewDele
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        print(send_criterias)
+//        print(send_criterias)
         self.title = "Discussion Analytics"
-        print("filename: \(filename)")
+//        print("filename: \(filename)")
         view.backgroundColor = .white
         let duration = initialTime - finishTime
         let time = timerFormat(seconds: duration)
@@ -266,11 +266,11 @@ class ResultViewController: UIViewController, ChartViewDelegate, UITableViewDele
         collectionView.delegate = self
         collectionView.backgroundColor = .white
         
-        if modeSwitch == true{
+        if (modeSwitch == true) || (responseTypeCnt.max() != 0){
             greenView.addSubview(collectionView)
+            greenView.addSubview(spokenLabel)
         }
         
-        greenView.addSubview(spokenLabel)
         pinkView.addSubview(titleLabel)
         tablesTitleView.addSubview(tableTitleLabel)
 //        purpleView.addSubview(durationLabel)

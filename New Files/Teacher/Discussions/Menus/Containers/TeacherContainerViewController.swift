@@ -32,6 +32,7 @@ class TeacherContainerViewController: UIViewController{
     lazy var registerVC = teacherRegisterViewController()
     lazy var historyVC = HistoryViewController()
     lazy var viewRegisterVC = teacherViewRegisiteredViewController()
+    lazy var recordVC = RecordListViewController()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -49,6 +50,7 @@ class TeacherContainerViewController: UIViewController{
         registerVC.popDelegate = self
         viewRegisterVC.popDelegate = self
         historyVC.popDelegate = self
+        recordVC.popDelegate = self
         
         addChild(MenuVC)
         view.addSubview(MenuVC.view)
@@ -111,8 +113,6 @@ extension TeacherContainerViewController: TeacherMenuViewControllerDelegate, loa
             self.addProfile()
         case .info:
             break
-        case .classroom:
-            self.addClassroom()
         case .classList:
             self.addClassList()
         }
@@ -169,6 +169,17 @@ extension TeacherContainerViewController: TeacherMenuViewControllerDelegate, loa
             vc.didMove(toParent: self)
             HomeVC.title = vc.title
         }
+        else if (page==5){
+            let vc = recordVC
+            vc.title = "\(info!.classroom): Records"
+            vc.classInfo = info
+            HomeVC.addChild(vc)
+            HomeVC.view.addSubview(vc.view)
+            ClassVCTagQueue.append(vc.view.tag)
+            vc.view.frame = view.frame
+            vc.didMove(toParent: self)
+            HomeVC.title = vc.title
+        }
         
     }
     
@@ -197,6 +208,10 @@ extension TeacherContainerViewController: TeacherMenuViewControllerDelegate, loa
             else if ClassVCTagQueue.last == 2 {
                 registerVC.view.removeFromSuperview()
                 registerVC.didMove(toParent: nil)
+            }
+            else if ClassVCTagQueue.last == 9 {
+                recordVC.view.removeFromSuperview()
+                recordVC.didMove(toParent: nil)
             }
             ClassVCTagQueue.popLast()
         }

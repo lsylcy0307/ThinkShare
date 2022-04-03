@@ -104,23 +104,12 @@ class HistoryViewController: UIViewController {
                              action: #selector(didTapBack),
                              for: .touchUpInside)
         
-        title = "History"
+//        title = "History"
         view.backgroundColor = .white
         view.tag = 8
         view.addSubview(tableView)
         view.addSubview(noSettingsLabel)
         view.addSubview(backButton)
-//        guard let identity = UserDefaults.standard.value(forKey: "identity") as? String else {
-//            return
-//       }
-//        if (identity == "Teacher"){
-//            print(identity)
-//            self.identity = "Teacher"
-//            view.addSubview(backButton)
-//        }
-//        else{
-//            self.identity = "Students"
-//        }
     }
     
     
@@ -135,12 +124,6 @@ class HistoryViewController: UIViewController {
             self.setupTableView()
             self.getHistory()
         }
-//        if(sort == "t"){
-//            DispatchQueue.main.async {
-//                self.setupTableView()
-//                self.getHistory()
-//            }
-//        }
     }
     
     private func setupTableView() {
@@ -183,12 +166,6 @@ class HistoryViewController: UIViewController {
                                   y: 80,
                                   width: 200,
                                   height: 50)
-//        if(self.identity == "Teacher"){
-//            backButton.frame = CGRect(x: 20,
-//                                      y: 80,
-//                                      width: 200,
-//                                      height: 50)
-//        }
         tableView.frame = CGRect(x: 0, y: 150, width: view.width, height: view.height-150)
         noSettingsLabel.frame = CGRect(x: 10,
                                           y: (view.height-100)/2,

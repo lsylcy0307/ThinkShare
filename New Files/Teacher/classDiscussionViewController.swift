@@ -60,6 +60,17 @@ class classDiscussionViewController: UIViewController {
         return button
     }()
     
+    private let recordButton: UIButton = {
+        let button = UIButton()
+        button.setTitle("Individual \nRecords", for: .normal)
+        button.backgroundColor = UIColor(red: 253/255, green: 242/255, blue: 231/255, alpha: 1)
+        button.layer.cornerRadius = 20
+        button.setTitleColor(UIColor.black, for: .normal)
+        button.layer.masksToBounds = true
+        button.titleLabel?.font = UIFont(name: "NotoSansKannada-Bold", size: 40)
+        return button
+    }()
+    
     public var classInfo:classrooms?
     weak var popDelegate:popClassVCDelegate?
 
@@ -81,10 +92,14 @@ class classDiscussionViewController: UIViewController {
         historyButton.addTarget(self,
                                        action: #selector(didTapHistory),
                                        for: .touchUpInside)
+        recordButton.addTarget(self,
+                                       action: #selector(didTapRecord),
+                                       for: .touchUpInside)
         view.addSubview(registerButton)
         view.addSubview(registeredListButton)
         view.addSubview(historyButton)
         view.addSubview(backButton)
+        view.addSubview(recordButton)
     }
     
     override func viewDidLayoutSubviews() {
@@ -93,17 +108,21 @@ class classDiscussionViewController: UIViewController {
                                   y: 80,
                                   width: 200,
                                   height: 50)
-        registerButton.frame = CGRect(x: view.frame.size.width/8,
+        registerButton.frame = CGRect(x: 20,
                                    y: view.frame.size.height/4,
-                                   width: view.frame.size.width/4,
+                                   width: (view.frame.size.width/4 - 20),
                                    height: view.frame.size.height/2)
         registeredListButton.frame = CGRect(x: registerButton.right + 15,
                                             y: view.frame.size.height/4,
-                                            width: view.frame.size.width/4,
+                                            width: (view.frame.size.width/4 - 20),
                                             height: view.frame.size.height/2)
         historyButton.frame = CGRect(x:registeredListButton.right + 15,
                                     y: view.frame.size.height/4,
-                                    width: view.frame.size.width/4,
+                                    width: (view.frame.size.width/4 - 20),
+                                    height: view.frame.size.height/2)
+        recordButton.frame = CGRect(x:historyButton.right + 15,
+                                    y: view.frame.size.height/4,
+                                    width: (view.frame.size.width/4 - 20),
                                     height: view.frame.size.height/2)
     }
     
@@ -127,5 +146,8 @@ class classDiscussionViewController: UIViewController {
         delegate?.onLoadView(with: classInfo, page: 4)
     }
 
+    @objc private func didTapRecord(){
+        delegate?.onLoadView(with: classInfo, page: 5)
+    }
 
 }

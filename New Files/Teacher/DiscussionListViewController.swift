@@ -12,6 +12,16 @@ protocol TeacherHomeViewControllerDelegate: AnyObject {
     func didTapMenuButton()
 }
 
+private let createButton: UIButton = {
+    let button = UIButton()
+    button.setTitle("Create a setting", for: .normal)
+    button.backgroundColor = UIColor(cgColor: CGColor(red: 87/255, green: 149/255, blue: 149/255, alpha: 1))
+    button.setTitleColor(.white, for: .normal)
+    button.layer.masksToBounds = true
+    button.layer.cornerRadius = 20
+    button.titleLabel?.font = UIFont(name: "NotoSansKannada-Bold", size: 20)
+    return button
+}()
 
 class DiscussionListViewController: UIViewController {
     weak var delegate: TeacherHomeViewControllerDelegate?
@@ -39,18 +49,30 @@ class DiscussionListViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "Home"
+        title = "Home: discussion settings"
         navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "list.dash"), style: .done, target: self, action: #selector(TapMenuButton))
         
-        let add = UIBarButtonItem(title: "create", style: .plain, target: self, action: #selector(addTapped))
-        navigationItem.rightBarButtonItem = add
+//        let add = UIBarButtonItem(title: "create", style: .plain, target: self, action: #selector(addTapped))
+//        navigationItem.rightBarButtonItem = add
+        
+        createButton.addTarget(self,
+                             action: #selector(didTapCreate),
+                             for: .touchUpInside)
         
         view.backgroundColor = .white
         
         view.addSubview(tableView)
+        view.addSubview(createButton)
         view.addSubview(noDiscussionsLabel)
         setupTableView()
         getRegisteredDiscussions()
+    }
+    
+    @objc private func didTapCreate(){
+        let vc = CreateDiscussionViewController()
+        let navVC = UINavigationController(rootViewController: vc)
+        navVC.modalPresentationStyle = .overFullScreen
+        self.present(navVC, animated: true)
     }
     
     @objc func TapMenuButton(){
@@ -98,20 +120,26 @@ class DiscussionListViewController: UIViewController {
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        tableView.frame = view.bounds
+        
+        createButton.frame = CGRect(x: 20,
+                                  y: 80,
+                                  width: 200,
+                                  height: 50)
+        tableView.frame = CGRect(x: 0, y: 150, width: view.width, height: view.height-150)
+        
         noDiscussionsLabel.frame = CGRect(x: 10,
                                           y: (view.height-100)/2,
                                           width: view.width-20,
                                           height: 100)
     }
     
-    @objc func addTapped(){
-        let vc = CreateDiscussionViewController()
-        let navVC = UINavigationController(rootViewController: vc)
-        navVC.modalPresentationStyle = .overFullScreen
-        self.present(navVC, animated: true)
-    }
-    
+//    @objc func addTapped(){
+//        let vc = CreateDiscussionViewController()
+//        let navVC = UINavigationController(rootViewController: vc)
+//        navVC.modalPresentationStyle = .overFullScreen
+//        self.present(navVC, animated: true)
+//    }
+//
 }
 
 extension DiscussionListViewController: UITableViewDelegate, UITableViewDataSource {
@@ -142,6 +170,7 @@ extension DiscussionListViewController: UITableViewDelegate, UITableViewDataSour
             if editingStyle == .delete {
                 // begin delete
                 let settingcode = discussions[indexPath.row].code
+                print(settingcode)
                 tableView.beginUpdates()
                 self.discussions.remove(at: indexPath.row)
                 tableView.deleteRows(at: [indexPath], with: .left)

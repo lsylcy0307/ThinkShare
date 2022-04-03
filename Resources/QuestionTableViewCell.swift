@@ -74,10 +74,15 @@ class QuestionTableViewCell: UITableViewCell {
         // Configure the view for the selected state
     }
     
-    public func configure(with color:UIColor, question: String, time: Int) {
-        
-        let time_second = timerFormat(seconds: time)
-        let timeString = makeTimeString(minutes: time_second.0, seconds: time_second.1)
+    public func configure(with color:UIColor, question: String, time: Int?) {
+        var timeString = ""
+        if (time==nil){
+            timeString = ""
+        }
+        else{
+            let time_second = timerFormat(seconds: time!)
+            timeString = makeTimeString(minutes: time_second.0, seconds: time_second.1)
+        }
         
 //        ImageView.layer.borderColor = CGColor(red: 106, green: 106, blue: 106, alpha: 1)
 //        ImageView.layer.borderWidth = 1

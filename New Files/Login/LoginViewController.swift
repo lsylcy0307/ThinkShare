@@ -165,14 +165,14 @@ class LoginViewController: UIViewController {
         passwordField.delegate = self
         
         
-        view.addSubview(scrollView)
-        scrollView.addSubview(loginLabel)
-        scrollView.addSubview(infoLabel)
-        scrollView.addSubview(emailField)
-        scrollView.addSubview(passwordField)
-        scrollView.addSubview(loginButton)
-        scrollView.addSubview(registerLabel)
-        scrollView.addSubview(registerButton)
+//        view.addSubview(scrollView)
+        view.addSubview(loginLabel)
+        view.addSubview(infoLabel)
+        view.addSubview(emailField)
+        view.addSubview(passwordField)
+        view.addSubview(loginButton)
+        view.addSubview(registerLabel)
+        view.addSubview(registerButton)
     }
     //dimiss observer
     deinit {
@@ -183,7 +183,7 @@ class LoginViewController: UIViewController {
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        scrollView.frame = view.bounds
+//        scrollView.frame = view.bounds
 //        let size = scrollView.width/4
 //        imageView.frame = CGRect(x: (view.frame.size.width-size)/2,
 //                                 y: scrollView.height/4,
@@ -193,11 +193,11 @@ class LoginViewController: UIViewController {
         infoLabel.frame = CGRect(x: view.frame.size.width/4, y: loginLabel.bottom+10, width: 300, height: 30)
         emailField.frame = CGRect(x: view.frame.size.width/4,
                                   y: infoLabel.bottom+30,
-                                  width: scrollView.width/2,
+                                  width: self.view.width/2,
                                   height: 52)
         passwordField.frame = CGRect(x: view.frame.size.width/4,
                                      y: emailField.bottom+10,
-                                     width: scrollView.width/2,
+                                     width: self.view.width/2,
                                      height: 52)
         loginButton.frame = CGRect(x: passwordField.right - 180,
                                    y: passwordField.bottom+10,
@@ -250,7 +250,7 @@ class LoginViewController: UIViewController {
                 return
             }
             
-            let user = result.user
+//            let user = result.user
             UserDefaults.standard.set(email, forKey: "email")
             
             guard let window = UIApplication.shared.windows.first(where: { $0.isKeyWindow }) else {

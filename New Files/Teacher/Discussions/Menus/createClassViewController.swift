@@ -136,18 +136,19 @@ class createClassViewController: UIViewController, nameViewDelegate {
                 data.append(textName)
             }
         }
-        if(data.isEmpty != true){
+        if(data.count != 1){
             guard let className = classNameInput.text else {
                 return
             }
             DatabaseManager.shared.addClassroom(with: data, className: className, names:data, completion: {success in
                 if success {
                     print("successfully added the discussion setting")
-                    self.backToMain()
+//                    self.backToMain()
                 }
             })
         }
         else{
+            print("empty")
             self.backToMain()
         }
     }

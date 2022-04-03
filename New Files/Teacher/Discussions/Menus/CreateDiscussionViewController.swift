@@ -39,8 +39,7 @@ class CreateDiscussionViewController: UIViewController, TaskViewDelegate {
         return stackView
     }()
     
-    
-    private var count = 0
+//    private var count = 0
     
     init() {
         super.init(nibName: nil, bundle: nil)
@@ -54,8 +53,9 @@ class CreateDiscussionViewController: UIViewController, TaskViewDelegate {
         super.viewDidLoad()
         self.title = "Discussion Settings"
         self.view.backgroundColor = .white
-        addLeftBarButton()
+//        addLeftBarButton()
         addRightBarButton()
+        addMoreView()
         
         view.addSubview(scrollView)
         scrollView.addSubview(taskStackView)
@@ -78,25 +78,26 @@ class CreateDiscussionViewController: UIViewController, TaskViewDelegate {
     
     @objc
     func addMoreView() {
-        count += 1
+//        count += 1
         let view = TaskView(delegate: self)
-        let constraint1 = view.heightAnchor.constraint(lessThanOrEqualToConstant: 400.0)
-        constraint1.isActive = true
+//        let constraint1 = view.heightAnchor.constraint(lessThanOrEqualToConstant: 400.0)
+//        constraint1.isActive = true
         self.taskStackView.addArrangedSubview(view)
         self.view.layoutIfNeeded()
-        self.navigationItem.leftBarButtonItem?.isEnabled = false
+//        self.navigationItem.leftBarButtonItem?.isEnabled = false
     }
     
     @objc func nextButtonTapped(){
         //add to the database
+//        var textNameData = ""
         var data = [discussionSetting]()
         for eachStackView in self.taskStackView.arrangedSubviews {
             if let taskview = eachStackView as? TaskView
             {
-                guard let textName = taskview.textNameInput.text,
-                      let textLink = taskview.textLinkInput.text else {
+                guard let textName = taskview.textNameInput.text else {
                     return
                 }
+//                textNameData = textName
                 
                 var questions:[String] = []
                 for eachInputView in taskview.inputStackView.arrangedSubviews {
@@ -105,7 +106,9 @@ class CreateDiscussionViewController: UIViewController, TaskViewDelegate {
                         guard let question = inputview.textInput.text else {
                             return
                         }
-                        questions.append(question)
+                        if(question != "" ){
+                            questions.append(question)
+                        }
                     }
                 }
                 var criterias:[String] = []
@@ -115,16 +118,20 @@ class CreateDiscussionViewController: UIViewController, TaskViewDelegate {
                         guard let criteria = criteriaview.textInput.text else {
                             return
                         }
-                        criterias.append(criteria)
+                        if(criteria != "" ){
+                            criterias.append(criteria)
+                        }
+                        
                     }
                 }
                 
-                let dataPoint = discussionSetting(textName: textName, textLink: textLink, questions: questions, criteria: criterias)
-                
-                data.append(dataPoint)
+                if((criterias.isEmpty != true) && (questions.isEmpty != true) && (textName != "")){
+                    let dataPoint = discussionSetting(textName: textName, textLink: " ", questions: questions, criteria: criterias)
+                    data.append(dataPoint)
+                }
             }
         }
-        if(data.isEmpty != true){
+        if((data.isEmpty != true)){
             DatabaseManager.shared.addDiscussionSetting(with: data, completion: {success in
                 if success {
                     print("successfully added the discussion setting")
@@ -149,7 +156,7 @@ class CreateDiscussionViewController: UIViewController, TaskViewDelegate {
     }
     
     func onRemove(_ view: TaskView) {
-        count -= 1
+//        count -= 1
         if let first = self.taskStackView.arrangedSubviews.first(where: { $0 === view }) {
             UIView.animate(withDuration: 0.3, animations: {
                 first.isHidden = true
