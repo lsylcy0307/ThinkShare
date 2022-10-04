@@ -143,7 +143,7 @@ class createClassViewController: UIViewController, nameViewDelegate {
             DatabaseManager.shared.addClassroom(with: data, className: className, names:data, completion: {success in
                 if success {
                     print("successfully added the discussion setting")
-//                    self.backToMain()
+                    self.backToMain()
                 }
             })
         }
@@ -152,6 +152,7 @@ class createClassViewController: UIViewController, nameViewDelegate {
             self.backToMain()
         }
     }
+    
     
     
     private func backToMain(){
